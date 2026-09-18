@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { PHOTO } from '../../lib/constants';
 import type { PendingPhoto } from '../../api/photos';
 
@@ -9,21 +9,27 @@ export function PhotoPickerField({
   onAdd,
   onRemove,
   onMove,
+  /** 수정 화면에서 이미 올라가 있는 사진. 새 사진과 같은 줄에 그려 한 덩어리로 보이게 한다. */
+  leading,
+  leadingCount = 0,
 }: {
   photos: PendingPhoto[];
   error: string | null;
   onAdd: (files: FileList | null) => void;
   onRemove: (index: number) => void;
   onMove: (from: number, to: number) => void;
+  leading?: ReactNode;
+  leadingCount?: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const full = photos.length >= PHOTO.maxPerEntry;
+  const full = leadingCount + photos.length >= PHOTO.maxPerEntry;
 
   return (
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium">사진</span>
 
       <div className="flex flex-wrap gap-2">
+        {leading}
         {photos.map((photo, index) => (
           <div key={photo.previewUrl} className="relative">
             <img

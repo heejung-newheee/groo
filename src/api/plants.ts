@@ -71,6 +71,20 @@ export async function setCoverPhoto(plantId: string, photoId: string): Promise<v
   if (error) throw error;
 }
 
+/**
+ * 대표 사진으로 쓰이던 사진이 지워지면 참조를 끊는다.
+ * FK 가 없어서(순환 참조 방지) DB 가 알아서 정리해주지 않는다.
+ * 그냥 두면 식물 카드가 영영 빈 자리로 남는다.
+ */
+export async function clearCoverIfMatches(plantId: string, photoId: string): Promise<void> {
+  const { error } = await supabase
+    .from('plants')
+    .update({ cover_photo_id: null })
+    .eq('id', plantId)
+    .eq('cover_photo_id', photoId);
+  if (error) throw error;
+}
+
 /** 떠나보낸 식물은 지우지 않고 archived_at 만 채운다 (기록 보존) */
 export async function archivePlant(id: string): Promise<void> {
   const { error } = await supabase
@@ -82,6 +96,32 @@ export async function archivePlant(id: string): Promise<void> {
 
 export async function restorePlant(id: string): Promise<void> {
   const { error } = await supabase.from('plants').update({ archived_at: null }).eq('id', id);
+  if (error) throw error;
+}
+
+/**
+ * 물주기 일지가 생기면 식물의 last_watered_at 도 같이 맞춘다.
+ * 이게 없으면 일지에 💧 를 달아도 홈의 물주기 배지가 "기록 없음"에서 안 바뀐다.
+ *
+ * 과거 사진을 뒤늦게 올리는 경우가 흔하므로 **뒤로는 가지 않는다** —
+ * 이미 더 최근 기록이 있으면 그대로 둔다.
+ */
+export async function syncLastWatered(plantId: string, wateredAtIso: string): Promise<void> {
+  const day = wateredAtIso.slice(0, 10);
+
+  const { data } = await supabase
+    .from('plants')
+    .select('last_watered_at')
+    .eq('id', plantId)
+    .maybeSingle();
+
+  const current = (data as { last_watered_at: string | null } | null)?.last_watered_at;
+  if (current && current >= day) return;
+
+  const { error } = await supabase
+    .from('plants')
+    .update({ last_watered_at: day })
+    .eq('id', plantId);
   if (error) throw error;
 }
 

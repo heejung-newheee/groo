@@ -17,7 +17,7 @@ import {
   type EntryInput,
 } from '../api/entries';
 import { uploadPhoto, type PendingPhoto } from '../api/photos';
-import { setCoverPhoto } from '../api/plants';
+import { setCoverPhoto, syncLastWatered } from '../api/plants';
 import { useUserId } from './useSession';
 
 /** 식물 상세 타임라인 — 무한스크롤 */
@@ -85,6 +85,10 @@ export function useCreateEntry() {
       if (setCoverIfEmpty && firstPhotoId) {
         await setCoverPhoto(entry.plant_id, firstPhotoId);
       }
+      // 💧 를 달았으면 식물의 물주기 주기도 리셋한다
+      if (entry.actions.includes('water')) {
+        await syncLastWatered(entry.plant_id, entry.recorded_at);
+      }
       return created;
     },
     onSuccess: (_data, vars) => {
@@ -95,14 +99,21 @@ export function useCreateEntry() {
   });
 }
 
-export function useUpdateEntry(id: string) {
+export function useUpdateEntry(id: string, plantId: string | undefined) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (patch: Partial<EntryInput>) => updateEntry(id, patch),
+    mutationFn: async (patch: Partial<EntryInput>) => {
+      await updateEntry(id, patch);
+      // 나중에 💧 를 추가한 경우도 반영한다
+      if (plantId && patch.actions?.includes('water') && patch.recorded_at) {
+        await syncLastWatered(plantId, patch.recorded_at);
+      }
+    },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.entries });
       void qc.invalidateQueries({ queryKey: qk.entry(id) });
+      void qc.invalidateQueries({ queryKey: qk.plants });
     },
   });
 }
