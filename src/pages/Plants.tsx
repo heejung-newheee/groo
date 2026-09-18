@@ -29,7 +29,7 @@ export function Plants() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">내 식물 ({plants.length})</h1>
+        <h1 className="text-xl font-bold">{plants.length} groo</h1>
         <Link to="/plants/new" className="text-sm font-medium text-leaf-600">
           + 등록
         </Link>

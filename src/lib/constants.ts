@@ -2,6 +2,8 @@
 export const BRAND = {
   nameKo: '그루',
   nameEn: 'Groo',
+  /** 로고에 쓰는 표기 */
+  wordmark: 'Groo',
   tagline: '오늘도 잘 자라는 중',
   storeTitle: '그루 - 식물 성장 일기',
 } as const;
@@ -26,8 +28,8 @@ export const PHOTO = {
   quality: 0.82,
   /** 원본 파일 최대 크기 (bytes) */
   maxBytes: 10 * 1024 * 1024,
-  /** 일지당 최대 장수 */
-  maxPerEntry: 5,
+  /** 일지당 최대 장수. 장당 200~400KB 라 10장이어도 무료 1GB 안에서 넉넉하다. */
+  maxPerEntry: 10,
   /** HEIC 를 제외해야 iOS Safari 가 자동으로 JPEG 로 변환해준다 */
   accept: 'image/jpeg,image/png,image/webp',
 } as const;

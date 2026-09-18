@@ -1,7 +1,7 @@
 import { Calendar, House, PenLine, Settings, Sprout } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router';
-import { BRAND } from '../../lib/constants';
 import { cn } from '../../lib/cn';
+import { Logo } from '../ui/Logo';
 
 const NAV = [
   { to: '/home', label: '홈', Icon: House },
@@ -23,10 +23,7 @@ export function AppShell() {
         className="hidden w-60 shrink-0 flex-col gap-1 border-r p-4 md:flex"
         style={{ borderColor: 'var(--border-subtle)' }}
       >
-        <div className="mb-6 flex items-center gap-2 px-2">
-          <Sprout className="size-6 text-leaf-500" aria-hidden />
-          <span className="text-lg font-bold">{BRAND.nameKo}</span>
-        </div>
+        <Logo className="mb-6 px-2 text-lg" />
 
         {NAV.map(({ to, label, Icon }) => (
           <NavLink

@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MailCheck, Sprout } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, Navigate } from 'react-router';
 import { authErrorMessage, signUpWithEmail } from '../api/auth';
-import { BRAND } from '../lib/constants';
 import { signUpSchema, type SignUpValues } from '../lib/schemas/auth';
 import { useSession } from '../hooks/useSession';
+import { Logo } from '../components/ui/Logo';
 import { Button } from '../components/ui/Button';
 import { Field, Input } from '../components/ui/Field';
 
@@ -45,8 +45,8 @@ export function Signup() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-6">
       <div className="flex flex-col items-center gap-2">
-        <Sprout className="size-12 text-leaf-500" aria-hidden />
-        <h1 className="text-xl font-bold">{BRAND.nameKo} 시작하기</h1>
+        <Logo vertical markClassName="size-12" wordClassName="text-3xl" />
+        <h1 className="text-lg font-bold">시작하기</h1>
       </div>
 
       <form

@@ -34,6 +34,8 @@
   --radius-input: 12px;
 
   /* ── Font ───────────────────────────────── */
+  /* 워드마크 전용. 없으면 애플 기기의 SF Pro Rounded 로 떨어진다. */
+  --font-brand: Quicksand, ui-rounded, 'SF Pro Rounded', var(--font-sans);
   --font-sans:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, sans-serif;
