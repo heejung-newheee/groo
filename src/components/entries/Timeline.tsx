@@ -44,7 +44,7 @@ export function Timeline({
                 <Photo
                   url={urls?.[first.storage_path]}
                   alt={`${plantName} ${formatMonthDay(entry.recorded_at)} 사진`}
-                  className="mt-2 aspect-[4/3] w-full rounded-card"
+                  className="mt-2 aspect-[4/3] w-full max-w-md rounded-card"
                 />
               )}
 

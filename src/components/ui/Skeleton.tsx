@@ -13,7 +13,7 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function PlantGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {[0, 1, 2, 3].map((i) => (
         <Skeleton key={i} className="aspect-[3/4]" />
       ))}

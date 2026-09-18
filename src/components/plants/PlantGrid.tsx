@@ -7,7 +7,7 @@ export function PlantGrid({ plants }: { plants: PlantWithCover[] }) {
   const { data: urls } = useSignedUrls(plants.map((p) => p.cover_path));
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {plants.map((plant) => (
         <PlantCard
           key={plant.id}

@@ -42,39 +42,44 @@ export function PlantDetail() {
   const coverUrl = plant.cover_path ? coverUrls?.[plant.cover_path] : undefined;
 
   return (
-    <div className="flex flex-col gap-5">
-      <Photo
-        url={coverUrl}
-        alt={`${plant.nickname} 대표 사진`}
-        className="aspect-[4/3] w-full rounded-card"
-      />
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+      {/* 넓은 화면에서는 사진을 키우는 대신 정보를 옆에 둔다 */}
+      <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-6">
+        <Photo
+          url={coverUrl}
+          alt={`${plant.nickname} 대표 사진`}
+          className="aspect-[4/3] w-full shrink-0 rounded-card md:w-1/2"
+        />
 
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold">{plant.nickname}</h1>
-          {plant.species && (
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              {plant.species}
-            </p>
-          )}
-          <p className="tabular mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
-            {formatDday(new Date(plant.adopted_at))}
-            {plant.location && ` · ${plant.location}`}
-          </p>
-          <WateringBadge plant={plant} className="mt-1" />
+        <div className="flex flex-1 flex-col gap-4">
+          <header className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-bold">{plant.nickname}</h1>
+              {plant.species && (
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  {plant.species}
+                </p>
+              )}
+              <p className="tabular mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+                {formatDday(new Date(plant.adopted_at))}
+                {plant.location && ` · ${plant.location}`}
+              </p>
+              <WateringBadge plant={plant} className="mt-1" />
+            </div>
+            <Link to={`/plants/${plant.id}/edit`} aria-label="식물 수정" className="p-2">
+              <Settings2 className="size-5" aria-hidden />
+            </Link>
+          </header>
+
+          <Link
+            to={`/entries/new?plantId=${plant.id}`}
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-input bg-leaf-500 font-semibold text-white"
+          >
+            <PenLine className="size-4" aria-hidden />
+            일지 쓰기
+          </Link>
         </div>
-        <Link to={`/plants/${plant.id}/edit`} aria-label="식물 수정" className="p-2">
-          <Settings2 className="size-5" aria-hidden />
-        </Link>
-      </header>
-
-      <Link
-        to={`/entries/new?plantId=${plant.id}`}
-        className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-input bg-leaf-500 font-semibold text-white"
-      >
-        <PenLine className="size-4" aria-hidden />
-        일지 쓰기
-      </Link>
+      </div>
 
       <section>
         <h2 className="mb-3 font-bold">📜 타임라인</h2>
