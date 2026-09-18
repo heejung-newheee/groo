@@ -1,5 +1,4 @@
-import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { formatDateTime } from '../lib/format';
 import { formatDday } from '../lib/dday';
@@ -8,6 +7,7 @@ import { useSignedUrls } from '../hooks/useSignedUrls';
 import { AskWebAiCard } from '../components/ai/AskWebAiCard';
 import { ActionList } from '../components/entries/ActionChips';
 import { DateSourceNotice } from '../components/entries/DateSourceNotice';
+import { Carousel } from '../components/ui/Carousel';
 import { Photo } from '../components/ui/Photo';
 import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState, ErrorState } from '../components/ui/States';
@@ -17,7 +17,6 @@ export function EntryDetail() {
   const navigate = useNavigate();
   const { data: entry, isPending, isError, refetch } = useEntry(id);
   const remove = useDeleteEntry();
-  const [index, setIndex] = useState(0);
 
   const { data: urls } = useSignedUrls(entry?.photos.map((p) => p.storage_path) ?? []);
 
@@ -25,34 +24,22 @@ export function EntryDetail() {
   if (isError) return <ErrorState onRetry={() => void refetch()} />;
   if (!entry) return <EmptyState title="기록을 찾을 수 없어요" />;
 
-  const photo = entry.photos[index];
   const plantName = entry.plant?.nickname ?? '식물';
+  const firstPhoto = entry.photos[0];
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-5">
-      {photo && (
-        <div className="flex flex-col gap-2">
+      <Carousel
+        label={`${plantName} 사진`}
+        slides={entry.photos.map((p, i) => (
           <Photo
-            url={urls?.[photo.storage_path]}
-            alt={`${plantName} ${formatDateTime(entry.recorded_at)} 사진`}
+            key={p.id}
+            url={urls?.[p.storage_path]}
+            alt={`${plantName} ${formatDateTime(entry.recorded_at)} 사진 ${i + 1}`}
             className="aspect-[4/3] w-full rounded-card"
           />
-          {entry.photos.length > 1 && (
-            <div className="flex justify-center gap-2">
-              {entry.photos.map((p, i) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setIndex(i)}
-                  aria-label={`사진 ${i + 1} 보기`}
-                  aria-current={i === index}
-                  className={i === index ? 'size-2 rounded-full bg-leaf-500' : 'size-2 rounded-full bg-leaf-300'}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+        ))}
+      />
 
       <header className="flex items-start justify-between gap-3">
         <div>
@@ -70,18 +57,24 @@ export function EntryDetail() {
           <DateSourceNotice source={entry.date_source} />
         </div>
 
-        <button
-          type="button"
-          aria-label="기록 삭제"
-          disabled={remove.isPending}
-          onClick={() => {
-            if (!window.confirm('이 기록을 삭제할까요? 되돌릴 수 없어요.')) return;
-            remove.mutate(entry.id, { onSuccess: () => void navigate(-1) });
-          }}
-          className="p-2 text-urgent-500 disabled:opacity-50"
-        >
-          <Trash2 className="size-5" aria-hidden />
-        </button>
+        <div className="flex shrink-0 items-center">
+          <Link to={`/entries/${entry.id}/edit`} aria-label="기록 수정" className="p-2">
+            <Pencil className="size-5" aria-hidden />
+          </Link>
+
+          <button
+            type="button"
+            aria-label="기록 삭제"
+            disabled={remove.isPending}
+            onClick={() => {
+              if (!window.confirm('이 기록을 삭제할까요? 되돌릴 수 없어요.')) return;
+              remove.mutate(entry.id, { onSuccess: () => void navigate(-1) });
+            }}
+            className="p-2 text-urgent-500 disabled:opacity-50"
+          >
+            <Trash2 className="size-5" aria-hidden />
+          </button>
+        </div>
       </header>
 
       <ActionList actions={entry.actions} />
@@ -93,7 +86,7 @@ export function EntryDetail() {
       <AskWebAiCard
         plant={entry.plant}
         entry={entry}
-        photoUrl={photo ? urls?.[photo.storage_path] : undefined}
+        photoUrl={firstPhoto ? urls?.[firstPhoto.storage_path] : undefined}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { Bot, Check, Copy, Download } from 'lucide-react';
+import { Bot, Check, ChevronDown, Copy, Download } from 'lucide-react';
 import { useState } from 'react';
 import { buildAskPrompt } from '../../lib/aiPrompt';
 import { AI } from '../../lib/constants';
@@ -22,10 +22,12 @@ export function AskWebAiCard({
   entry: { recorded_at: string; actions: CareAction[]; note: string | null };
   photoUrl: string | undefined;
 }) {
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
-  const prompt = buildAskPrompt(plant, entry);
+  // 접혀 있을 때는 만들지 않는다 — 버튼을 눌러야 생성된다
+  const prompt = open ? buildAskPrompt(plant, entry) : '';
 
   async function handleCopy() {
     try {
@@ -59,12 +61,36 @@ export function AskWebAiCard({
     }
   }
 
+  // 카드가 화면을 많이 차지해서 기본은 접어둔다
+  if (!open) {
+    return (
+      <Card className="p-0">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-expanded={false}
+          className="flex min-h-[56px] w-full items-center gap-2 px-4 text-left"
+        >
+          <Bot className="size-4 shrink-0 text-leaf-500" aria-hidden />
+          <span className="flex-1 font-semibold">AI에게 물어보기</span>
+          <ChevronDown className="size-4 shrink-0" aria-hidden />
+        </button>
+      </Card>
+    );
+  }
+
   return (
     <Card className="flex flex-col gap-3">
-      <span className="inline-flex items-center gap-2 font-bold">
-        <Bot className="size-4 text-leaf-500" aria-hidden />
-        AI에게 물어보기
-      </span>
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        aria-expanded
+        className="flex items-center gap-2 text-left"
+      >
+        <Bot className="size-4 shrink-0 text-leaf-500" aria-hidden />
+        <span className="flex-1 font-bold">AI에게 물어보기</span>
+        <ChevronDown className="size-4 shrink-0 rotate-180" aria-hidden />
+      </button>
 
       <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
         아래 문구를 복사해 ChatGPT나 Claude에 붙여넣고, 사진을 함께 올려주세요.
