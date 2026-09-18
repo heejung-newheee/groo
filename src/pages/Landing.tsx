@@ -1,7 +1,8 @@
-import { Sprout } from 'lucide-react';
 import { Link, Navigate } from 'react-router';
 import { BRAND } from '../lib/constants';
 import { useSession } from '../hooks/useSession';
+import { OnboardingSlides } from '../components/onboarding/OnboardingSlides';
+import { Logo } from '../components/ui/Logo';
 
 export function Landing() {
   const { data: session, isPending } = useSession();
@@ -10,22 +11,20 @@ export function Landing() {
   if (session) return <Navigate to="/home" replace />;
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-6 px-6 text-center">
-      <Sprout className="size-16 text-leaf-500" aria-hidden />
-      <div>
-        <h1 className="text-3xl font-bold">{BRAND.nameKo}</h1>
-        <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-8 px-6 py-10">
+      <header className="flex flex-col items-center gap-2 text-center">
+        <h1>
+          <Logo vertical markClassName="size-14" wordClassName="text-4xl" />
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
           {BRAND.tagline}
         </p>
-      </div>
-      <p className="text-[15px] leading-relaxed">
-        식물의 성장을 사진으로 기록하세요.
-        <br />
-        사진을 올리면 촬영일시를 자동으로 가져오고,
-        <br />
-        AI에게 상태를 물어볼 수 있어요.
-      </p>
-      <div className="flex w-full flex-col gap-2">
+      </header>
+
+      <OnboardingSlides />
+
+      {/* 시작 버튼은 슬라이드를 다 안 봐도 항상 닿을 수 있어야 한다 */}
+      <div className="flex flex-col gap-2">
         <Link
           to="/signup"
           className="flex min-h-[48px] items-center justify-center rounded-input bg-leaf-500 px-4 font-semibold text-white"
