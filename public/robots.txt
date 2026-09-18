@@ -1,0 +1,11 @@
+# 랜딩만 공개하고 로그인 뒤 화면은 색인에서 뺀다.
+# SPA 라 /home 같은 경로도 200 으로 index.html 을 돌려주는데,
+# 그대로 두면 빈 페이지가 중복 색인된다.
+User-agent: *
+Allow: /$
+Disallow: /home
+Disallow: /plants
+Disallow: /entries
+Disallow: /calendar
+Disallow: /settings
+Disallow: /auth

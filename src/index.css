@@ -1,0 +1,102 @@
+@import 'tailwindcss';
+
+@theme {
+  /* ── Primary: 잎 초록 ───────────────────── */
+  --color-leaf-50: #f1f7f2;
+  --color-leaf-100: #dcebe0;
+  --color-leaf-300: #8cbb98;
+  --color-leaf-500: #4a8b5c;
+  --color-leaf-600: #3a7049;
+  --color-leaf-700: #2c5537;
+
+  /* ── Accent: 흙 갈색 ────────────────────── */
+  --color-soil-300: #c4ac8a;
+  --color-soil-500: #8b6f47;
+  --color-soil-700: #5e4a2e;
+
+  /* ── Special ────────────────────────────── */
+  --color-bloom-400: #e8a0bf;
+
+  /* ── Semantic ───────────────────────────── */
+  --color-warn-500: #d97706;
+  --color-urgent-500: #dc2626;
+
+  /* ── Neutral ────────────────────────────── */
+  --color-cream-50: #fbf9f4;
+  --color-cream-100: #f4f1e9;
+  --color-bark-700: #3f3a35;
+  --color-bark-800: #2a2622;
+  --color-bark-900: #1c1917;
+
+  /* ── Radius ─────────────────────────────── */
+  --radius-card: 16px;
+  --radius-chip: 999px;
+  --radius-input: 12px;
+
+  /* ── Font ───────────────────────────────── */
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
+}
+
+/*
+ * 의미 기반 변수를 한 겹 더 둔다.
+ * 컴포넌트는 --bg-*, --text-* 만 참조한다.
+ * 색을 직접 참조하면 다크모드에서 전부 깨진다.
+ */
+:root {
+  --bg-base: var(--color-cream-50);
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --text-primary: var(--color-bark-900);
+  --text-muted: #6b6560;
+  --border-subtle: #e5e0d8;
+}
+
+:root:not([data-theme='light']) {
+  @media (prefers-color-scheme: dark) {
+    --bg-base: var(--color-bark-900);
+    --bg-surface: var(--color-bark-800);
+    --bg-elevated: var(--color-bark-700);
+    --text-primary: #f4f1e9;
+    --text-muted: #a8a099;
+    --border-subtle: #3f3a35;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg-base: var(--color-bark-900);
+  --bg-surface: var(--color-bark-800);
+  --bg-elevated: var(--color-bark-700);
+  --text-primary: #f4f1e9;
+  --text-muted: #a8a099;
+  --border-subtle: #3f3a35;
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* D-day 숫자가 흔들리지 않게 */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
