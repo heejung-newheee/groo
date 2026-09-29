@@ -24,7 +24,12 @@ async function attachCovers(plants: Plant[]): Promise<PlantWithCover[]> {
 }
 
 export async function listPlants(includeArchived = false): Promise<PlantWithCover[]> {
-  let query = supabase.from('plants').select('*').order('created_at', { ascending: false });
+  // 순서를 안 정한 새 식물(null)이 맨 앞에 온다
+  let query = supabase
+    .from('plants')
+    .select('*')
+    .order('sort_order', { ascending: true, nullsFirst: true })
+    .order('created_at', { ascending: false });
   if (!includeArchived) query = query.is('archived_at', null);
 
   const { data, error } = await query;
@@ -62,6 +67,15 @@ export async function createPlant(userId: string, input: PlantInput): Promise<Pl
 export async function updatePlant(id: string, patch: Partial<PlantInput>): Promise<void> {
   const { error } = await supabase.from('plants').update(patch).eq('id', id);
   if (error) throw error;
+}
+
+/** 넘긴 순서대로 sort_order 를 0 부터 매긴다. 식물 수가 적어서 건별 update 로 충분하다. */
+export async function reorderPlants(ids: string[]): Promise<void> {
+  const results = await Promise.all(
+    ids.map((id, index) => supabase.from('plants').update({ sort_order: index }).eq('id', id)),
+  );
+  const failed = results.find((r) => r.error);
+  if (failed?.error) throw failed.error;
 }
 
 export async function setCoverPhoto(plantId: string, photoId: string): Promise<void> {

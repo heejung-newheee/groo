@@ -6,6 +6,7 @@ import {
   getPlant,
   listPlants,
   markWatered,
+  reorderPlants,
   restorePlant,
   updatePlant,
   type PlantInput,
@@ -48,6 +49,16 @@ export function useUpdatePlant(id: string) {
       // 일지 조회에 식물 정보(입양일 등)가 같이 붙어 온다
       void qc.invalidateQueries({ queryKey: qk.entries });
     },
+  });
+}
+
+export function useReorderPlants() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (ids: string[]) => reorderPlants(ids),
+    // 새 순서를 받아온 뒤에 편집 모드가 닫히도록 기다린다 (예전 순서가 잠깐 보이지 않게)
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.plants }),
   });
 }
 

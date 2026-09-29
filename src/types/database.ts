@@ -194,6 +194,7 @@ export type Database = {
           last_watered_at: string | null
           location: string | null
           nickname: string
+          sort_order: number | null
           species: string | null
           updated_at: string
           user_id: string
@@ -209,6 +210,7 @@ export type Database = {
           last_watered_at?: string | null
           location?: string | null
           nickname: string
+          sort_order?: number | null
           species?: string | null
           updated_at?: string
           user_id: string
@@ -224,6 +226,7 @@ export type Database = {
           last_watered_at?: string | null
           location?: string | null
           nickname?: string
+          sort_order?: number | null
           species?: string | null
           updated_at?: string
           user_id?: string

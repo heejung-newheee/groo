@@ -31,6 +31,8 @@ export interface Plant {
   last_watered_at: string | null;
   /** 캘린더 점 색 (#rrggbb). null 이면 기본 초록 */
   calendar_color: string | null;
+  /** 사용자가 정한 순서. null 이면 맨 앞(최신순) */
+  sort_order: number | null;
   archived_at: string | null;
   created_at: string;
   updated_at: string;
