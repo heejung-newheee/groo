@@ -36,7 +36,7 @@ export function EntryDetail() {
             key={p.id}
             url={urls?.[p.storage_path]}
             alt={`${plantName} ${formatDateTime(entry.recorded_at)} 사진 ${i + 1}`}
-            className="aspect-[4/3] w-full rounded-card"
+            className="aspect-[4/3] w-full"
           />
         ))}
       />

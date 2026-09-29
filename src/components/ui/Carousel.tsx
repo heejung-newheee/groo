@@ -57,7 +57,7 @@ export function Carousel({
         <ul
           ref={trackRef}
           aria-label={label}
-          className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex rounded-card overflow-hidden snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           // touch-action 은 건드리지 않는다. 기본값 auto 라야 브라우저가
           // 가로 스와이프와 세로 페이지 스크롤을 알아서 구분한다.
           // pan-y 를 주면 가로 패닝이 아예 막힌다.

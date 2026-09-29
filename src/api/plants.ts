@@ -107,7 +107,8 @@ export async function restorePlant(id: string): Promise<void> {
  * 이미 더 최근 기록이 있으면 그대로 둔다.
  */
 export async function syncLastWatered(plantId: string, wateredAtIso: string): Promise<void> {
-  const day = wateredAtIso.slice(0, 10);
+  // ISO 는 UTC 라 slice 하면 한국 오전(0~9시) 기록이 전날로 저장된다
+  const day = format(new Date(wateredAtIso), 'yyyy-MM-dd');
 
   const { data } = await supabase
     .from('plants')
