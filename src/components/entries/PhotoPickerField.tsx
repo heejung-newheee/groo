@@ -1,7 +1,8 @@
-import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
-import { useRef, type ReactNode } from 'react';
+import { ChevronLeft, ChevronRight, Crop, Plus, X } from 'lucide-react';
+import { useRef, useState, type ReactNode } from 'react';
 import { PHOTO } from '../../lib/constants';
 import type { PendingPhoto } from '../../api/photos';
+import { PhotoEditor } from './PhotoEditor';
 
 export function PhotoPickerField({
   photos,
@@ -9,6 +10,7 @@ export function PhotoPickerField({
   onAdd,
   onRemove,
   onMove,
+  onReplace,
   /** 수정 화면에서 이미 올라가 있는 사진. 새 사진과 같은 줄에 그려 한 덩어리로 보이게 한다. */
   leading,
   leadingCount = 0,
@@ -18,10 +20,14 @@ export function PhotoPickerField({
   onAdd: (files: FileList | null) => void;
   onRemove: (index: number) => void;
   onMove: (from: number, to: number) => void;
+  /** 회전·크롭한 결과로 바꾼다 */
+  onReplace: (index: number, blob: Blob) => void;
   leading?: ReactNode;
   leadingCount?: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [editing, setEditing] = useState<number | null>(null);
+  const editingPhoto = editing === null ? undefined : photos[editing];
   const full = leadingCount + photos.length >= PHOTO.maxPerEntry;
 
   return (
@@ -32,11 +38,21 @@ export function PhotoPickerField({
         {leading}
         {photos.map((photo, index) => (
           <div key={photo.previewUrl} className="relative">
-            <img
-              src={photo.previewUrl}
-              alt={`선택한 사진 ${index + 1}`}
-              className="size-24 rounded-input object-cover"
-            />
+            <button
+              type="button"
+              onClick={() => setEditing(index)}
+              aria-label={`사진 ${index + 1} 회전·자르기`}
+              className="relative block"
+            >
+              <img
+                src={photo.previewUrl}
+                alt={`선택한 사진 ${index + 1}`}
+                className="size-24 rounded-input object-cover"
+              />
+              <span className="absolute bottom-1 left-1 flex size-6 items-center justify-center rounded-full bg-bark-800/80 text-white">
+                <Crop className="size-3.5" aria-hidden />
+              </span>
+            </button>
             <button
               type="button"
               onClick={() => onRemove(index)}
@@ -99,6 +115,17 @@ export function PhotoPickerField({
         최대 {PHOTO.maxPerEntry}장 · 첫 장이 대표 사진이 돼요
       </span>
       {error && <span className="text-xs text-urgent-500">{error}</span>}
+
+      {editing !== null && editingPhoto && (
+        <PhotoEditor
+          src={editingPhoto.previewUrl}
+          onCancel={() => setEditing(null)}
+          onDone={(blob) => {
+            onReplace(editing, blob);
+            setEditing(null);
+          }}
+        />
+      )}
     </div>
   );
 }

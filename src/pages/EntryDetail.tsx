@@ -1,5 +1,8 @@
-import { Pencil, Trash2 } from 'lucide-react';
+import { Download, Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { format } from 'date-fns';
 import { Link, useNavigate, useParams } from 'react-router';
+import { downloadUrl } from '../lib/download';
 import { formatDateTime } from '../lib/format';
 import { formatDday } from '../lib/dday';
 import { useDeleteEntry, useEntry } from '../hooks/useEntries';
@@ -17,6 +20,8 @@ export function EntryDetail() {
   const navigate = useNavigate();
   const { data: entry, isPending, isError, refetch } = useEntry(id);
   const remove = useDeleteEntry();
+  const [active, setActive] = useState(0);
+  const [downloading, setDownloading] = useState(false);
 
   const { data: urls } = useSignedUrls(entry?.photos.map((p) => p.storage_path) ?? []);
 
@@ -26,11 +31,25 @@ export function EntryDetail() {
 
   const plantName = entry.plant?.nickname ?? '식물';
   const firstPhoto = entry.photos[0];
+  const activePhoto = entry.photos[active];
+  const activeUrl = activePhoto ? urls?.[activePhoto.storage_path] : undefined;
+  const recordedDay = format(new Date(entry.recorded_at), 'yyyy-MM-dd');
+
+  async function handleDownload() {
+    if (!activeUrl) return;
+    setDownloading(true);
+    try {
+      await downloadUrl(activeUrl, `${plantName}-${recordedDay}-${active + 1}.webp`);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-5">
       <Carousel
         label={`${plantName} 사진`}
+        onActiveChange={setActive}
         slides={entry.photos.map((p, i) => (
           <Photo
             key={p.id}
@@ -58,6 +77,17 @@ export function EntryDetail() {
         </div>
 
         <div className="flex shrink-0 items-center">
+          {activeUrl && (
+            <button
+              type="button"
+              aria-label={`사진 ${active + 1} 저장`}
+              disabled={downloading}
+              onClick={() => void handleDownload()}
+              className="p-2 disabled:opacity-50"
+            >
+              <Download className="size-5" aria-hidden />
+            </button>
+          )}
           <Link to={`/entries/${entry.id}/edit`} aria-label="기록 수정" className="p-2">
             <Pencil className="size-5" aria-hidden />
           </Link>

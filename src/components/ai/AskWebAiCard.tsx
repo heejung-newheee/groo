@@ -1,6 +1,7 @@
 import { Bot, Check, ChevronDown, Copy, Download } from 'lucide-react';
 import { useState } from 'react';
 import { buildAskPrompt } from '../../lib/aiPrompt';
+import { downloadUrl } from '../../lib/download';
 import { AI } from '../../lib/constants';
 import type { CareAction } from '../../lib/constants';
 import type { EntryPlant } from '../../types/models';
@@ -40,22 +41,11 @@ export function AskWebAiCard({
     }
   }
 
-  /**
-   * 서명 URL 은 교차 출처라 <a download> 가 먹지 않는다.
-   * blob 으로 받아서 내려줘야 파일로 저장된다.
-   */
   async function handleDownload() {
     if (!photoUrl) return;
     setDownloading(true);
     try {
-      const res = await fetch(photoUrl);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${plant?.nickname ?? 'plant'}-${entry.recorded_at.slice(0, 10)}.webp`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await downloadUrl(photoUrl, `${plant?.nickname ?? 'plant'}-${entry.recorded_at.slice(0, 10)}.webp`);
     } finally {
       setDownloading(false);
     }

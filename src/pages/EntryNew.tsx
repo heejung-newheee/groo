@@ -91,6 +91,7 @@ export function EntryNew() {
         onAdd={(files) => void handleAddPhotos(files)}
         onRemove={picker.remove}
         onMove={picker.move}
+        onReplace={picker.replace}
       />
 
       {/* 자동 추출이 실패해도 절대 막히지 않는다. 항상 보이고 항상 수정 가능하다. */}

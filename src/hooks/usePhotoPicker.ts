@@ -69,6 +69,20 @@ export function usePhotoPicker() {
     });
   }, []);
 
+  /** 편집(회전·크롭)한 결과로 바꾼다. 촬영시각은 원본에서 뽑아둔 값을 그대로 쓴다. */
+  const replace = useCallback((index: number, blob: Blob) => {
+    const previewUrl = URL.createObjectURL(blob);
+    createdUrls.current.push(previewUrl);
+    setPhotos((prev) =>
+      prev.map((photo, i) => {
+        if (i !== index) return photo;
+        URL.revokeObjectURL(photo.previewUrl);
+        const name = photo.file.name.replace(/\.[^.]+$/, '') + '.webp';
+        return { ...photo, file: new File([blob], name, { type: blob.type }), previewUrl };
+      }),
+    );
+  }, []);
+
   const move = useCallback((from: number, to: number) => {
     setPhotos((prev) => {
       if (to < 0 || to >= prev.length) return prev;
@@ -88,5 +102,5 @@ export function usePhotoPicker() {
     };
   }, []);
 
-  return { photos, error, add, remove, move };
+  return { photos, error, add, remove, move, replace };
 }

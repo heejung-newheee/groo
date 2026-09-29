@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { qk } from '../api/keys';
-import { deletePhoto, uploadPhoto, type PendingPhoto } from '../api/photos';
+import { deletePhoto, replacePhotoFile, uploadPhoto, type PendingPhoto } from '../api/photos';
 import { clearCoverIfMatches, setCoverPhoto } from '../api/plants';
 import { supabase } from '../lib/supabase';
 import type { Photo } from '../types/models';
@@ -11,6 +11,8 @@ export interface SavePhotosArgs {
   userId: string;
   /** 이미 올라가 있는 사진 중 지우기로 표시한 것 */
   removed: Photo[];
+  /** 이미 올라가 있는 사진 중 회전·크롭한 것 */
+  edited: { photo: Photo; blob: Blob }[];
   /** 새로 고른 사진 */
   added: PendingPhoto[];
   /** 새 사진의 sort_order 시작값 */
@@ -32,12 +34,17 @@ export function useSaveEntryPhotos() {
       plantId,
       userId,
       removed,
+      edited,
       added,
       nextSortOrder,
     }: SavePhotosArgs) => {
       for (const photo of removed) {
         await deletePhoto(photo);
         await clearCoverIfMatches(plantId, photo.id);
+      }
+
+      for (const { photo, blob } of edited) {
+        await replacePhotoFile(userId, plantId, photo, blob);
       }
 
       let firstUploadedId: string | null = null;

@@ -12,7 +12,7 @@ export interface ProcessedImage {
  * imageOrientation: 'from-image' 가 EXIF Orientation 을 자동 적용한다.
  * 빼면 아이폰 세로 사진이 눕는다.
  */
-export async function processImage(file: File): Promise<ProcessedImage> {
+export async function processImage(file: Blob): Promise<ProcessedImage> {
   const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
 
   const scale = Math.min(1, PHOTO.maxEdge / Math.max(bitmap.width, bitmap.height));
@@ -28,6 +28,45 @@ export async function processImage(file: File): Promise<ProcessedImage> {
 
   const blob = await canvas.convertToBlob({ type: 'image/webp', quality: PHOTO.quality });
   return { blob, width, height };
+}
+
+export interface CropArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * 90° 단위 회전 → 크롭. area 는 react-easy-crop 의 croppedAreaPixels 로,
+ * **회전된 이미지 기준** 좌표다. 그래서 먼저 통째로 돌려 그린 뒤 잘라낸다.
+ *
+ * 리사이즈는 여기서 하지 않는다 — 업로드 때 processImage 가 한다.
+ */
+export async function cropImage(source: Blob, area: CropArea, rotation: number): Promise<Blob> {
+  const bitmap = await createImageBitmap(source, { imageOrientation: 'from-image' });
+  const quarter = ((rotation / 90) % 4 + 4) % 4;
+  const swap = quarter % 2 === 1;
+
+  const rotated = new OffscreenCanvas(
+    swap ? bitmap.height : bitmap.width,
+    swap ? bitmap.width : bitmap.height,
+  );
+  const rctx = rotated.getContext('2d');
+  if (!rctx) throw new Error('canvas 컨텍스트를 만들 수 없습니다');
+  rctx.translate(rotated.width / 2, rotated.height / 2);
+  rctx.rotate((quarter * Math.PI) / 2);
+  rctx.drawImage(bitmap, -bitmap.width / 2, -bitmap.height / 2);
+  bitmap.close();
+
+  const width = Math.round(area.width);
+  const height = Math.round(area.height);
+  const out = new OffscreenCanvas(width, height);
+  const ctx = out.getContext('2d');
+  if (!ctx) throw new Error('canvas 컨텍스트를 만들 수 없습니다');
+  ctx.drawImage(rotated, Math.round(area.x), Math.round(area.y), width, height, 0, 0, width, height);
+
+  return out.convertToBlob({ type: 'image/webp', quality: 0.95 });
 }
 
 /**

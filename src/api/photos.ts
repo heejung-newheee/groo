@@ -59,3 +59,33 @@ export async function deletePhoto(photo: Photo): Promise<void> {
   if (error) throw error;
   await removeObjects([photo.storage_path]);
 }
+
+/**
+ * 이미 올린 사진을 편집본으로 바꾼다. row 는 그대로 두고 파일만 갈아끼운다 —
+ * 그래야 대표 사진 지정·순서·촬영시각·AI 분석 연결이 유지된다.
+ */
+export async function replacePhotoFile(
+  userId: string,
+  plantId: string,
+  photo: Photo,
+  edited: Blob,
+): Promise<void> {
+  const { blob, width, height } = await processImage(edited);
+  const path = buildStoragePath(userId, plantId);
+
+  const { error: uploadErr } = await supabase.storage
+    .from('plant-photos')
+    .upload(path, blob, { contentType: 'image/webp', upsert: false });
+  if (uploadErr) throw uploadErr;
+
+  const { error } = await supabase
+    .from('photos')
+    .update({ storage_path: path, width, height, bytes: blob.size })
+    .eq('id', photo.id);
+
+  if (error) {
+    await removeObjects([path]);
+    throw error;
+  }
+  await removeObjects([photo.storage_path]);
+}

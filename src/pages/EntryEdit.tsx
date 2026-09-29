@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { RotateCcw, X } from 'lucide-react';
+import { Crop, RotateCcw, X } from 'lucide-react';
 import { toDatetimeLocal } from '../lib/format';
 import { cn } from '../lib/cn';
 import type { CareAction } from '../lib/constants';
@@ -10,6 +10,7 @@ import { usePhotoPicker } from '../hooks/usePhotoPicker';
 import { useSignedUrls } from '../hooks/useSignedUrls';
 import { useUserId } from '../hooks/useSession';
 import { ActionChips } from '../components/entries/ActionChips';
+import { PhotoEditor } from '../components/entries/PhotoEditor';
 import { PhotoPickerField } from '../components/entries/PhotoPickerField';
 import { Button } from '../components/ui/Button';
 import { Field, Input, Textarea } from '../components/ui/Field';
@@ -32,6 +33,18 @@ export function EntryEdit() {
   } | null>(null);
   /** 지우기로 표시만 해둔다. 실제 삭제는 저장할 때. Storage 파일까지 지워서 되돌릴 수 없다. */
   const [removedIds, setRemovedIds] = useState<string[]>([]);
+  /** 회전·크롭한 기존 사진. 이것도 저장할 때 반영한다. */
+  const [edited, setEdited] = useState<Record<string, { blob: Blob; previewUrl: string }>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // 편집본 미리보기 objectURL 은 화면을 떠날 때 한 번에 해제한다
+  const createdUrls = useRef<string[]>([]);
+  useEffect(() => {
+    const urls = createdUrls.current;
+    return () => {
+      for (const url of urls) URL.revokeObjectURL(url);
+    };
+  }, []);
 
   const { data: urls } = useSignedUrls(entry?.photos.map((p) => p.storage_path) ?? []);
 
@@ -45,18 +58,26 @@ export function EntryEdit() {
   };
 
   const keptCount = entry.photos.length - removedIds.length;
+  const editedPhotos = entry.photos
+    .filter((p) => edited[p.id] && !removedIds.includes(p.id))
+    .map((p) => ({ photo: p, blob: edited[p.id]!.blob }));
+  const previewOf = (photo: { id: string; storage_path: string }) =>
+    edited[photo.id]?.previewUrl ?? urls?.[photo.storage_path];
+  const editingPhoto = entry.photos.find((p) => p.id === editingId);
+  const editingSrc = editingPhoto ? previewOf(editingPhoto) : undefined;
   const busy = update.isPending || savePhotos.isPending;
 
   async function handleSave() {
     if (!entry || !userId) return;
 
     // 사진을 먼저 반영한다. 여기서 실패하면 본문도 안 바뀌어 상태가 덜 꼬인다.
-    if (removedIds.length > 0 || picker.photos.length > 0) {
+    if (removedIds.length > 0 || editedPhotos.length > 0 || picker.photos.length > 0) {
       await savePhotos.mutateAsync({
         entryId: entry.id,
         plantId: entry.plant_id,
         userId,
         removed: entry.photos.filter((p) => removedIds.includes(p.id)),
+        edited: editedPhotos,
         added: picker.photos,
         nextSortOrder: entry.photos.length,
       });
@@ -90,19 +111,33 @@ export function EntryEdit() {
         onAdd={(files) => void picker.add(files)}
         onRemove={picker.remove}
         onMove={picker.move}
+        onReplace={picker.replace}
         leadingCount={keptCount}
         leading={entry.photos.map((photo, index) => {
           const removed = removedIds.includes(photo.id);
           return (
             <div key={photo.id} className="relative">
-              <img
-                src={urls?.[photo.storage_path]}
-                alt={`올려둔 사진 ${index + 1}`}
-                className={cn(
-                  'size-24 rounded-input object-cover transition-opacity',
-                  removed && 'opacity-30',
+              <button
+                type="button"
+                disabled={removed || !previewOf(photo)}
+                onClick={() => setEditingId(photo.id)}
+                aria-label={`올려둔 사진 ${index + 1} 회전·자르기`}
+                className="relative block"
+              >
+                <img
+                  src={previewOf(photo)}
+                  alt={`올려둔 사진 ${index + 1}`}
+                  className={cn(
+                    'size-24 rounded-input object-cover transition-opacity',
+                    removed && 'opacity-30',
+                  )}
+                />
+                {!removed && (
+                  <span className="absolute bottom-1 left-1 flex size-6 items-center justify-center rounded-full bg-bark-800/80 text-white">
+                    <Crop className="size-3.5" aria-hidden />
+                  </span>
                 )}
-              />
+              </button>
               <button
                 type="button"
                 aria-label={removed ? `사진 ${index + 1} 삭제 취소` : `사진 ${index + 1} 빼기`}
@@ -123,6 +158,19 @@ export function EntryEdit() {
           );
         })}
       />
+
+      {editingPhoto && editingSrc && (
+        <PhotoEditor
+          src={editingSrc}
+          onCancel={() => setEditingId(null)}
+          onDone={(blob) => {
+            const previewUrl = URL.createObjectURL(blob);
+            createdUrls.current.push(previewUrl);
+            setEdited((prev) => ({ ...prev, [editingPhoto.id]: { blob, previewUrl } }));
+            setEditingId(null);
+          }}
+        />
+      )}
 
       {removedIds.length > 0 && (
         <span className="-mt-3 text-xs text-warn-500">

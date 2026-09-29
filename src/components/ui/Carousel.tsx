@@ -14,11 +14,14 @@ export function Carousel({
   slides,
   className,
   slideClassName,
+  onActiveChange,
 }: {
   label: string;
   slides: ReactNode[];
   className?: string;
   slideClassName?: string;
+  /** 지금 보이는 슬라이드가 바뀔 때 */
+  onActiveChange?: (index: number) => void;
 }) {
   const trackRef = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(0);
@@ -32,7 +35,10 @@ export function Carousel({
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const index = Number((entry.target as HTMLElement).dataset['index']);
-            if (!Number.isNaN(index)) setActive(index);
+            if (!Number.isNaN(index)) {
+              setActive(index);
+              onActiveChange?.(index);
+            }
           }
         }
       },
@@ -41,7 +47,7 @@ export function Carousel({
 
     for (const child of track.children) io.observe(child);
     return () => io.disconnect();
-  }, [slides.length]);
+  }, [slides.length, onActiveChange]);
 
   function goTo(index: number) {
     const track = trackRef.current;
