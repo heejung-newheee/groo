@@ -17,6 +17,7 @@ import { ChevronLeft, ChevronRight, Droplet } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { cn } from '../lib/cn';
+import { DEFAULT_PLANT_COLOR } from '../lib/constants';
 import { nextWateringDate, plantWateringInput } from '../lib/watering';
 import { useEntriesByMonth } from '../hooks/useEntries';
 import { usePlants } from '../hooks/usePlants';
@@ -25,6 +26,8 @@ import { Skeleton } from '../components/ui/Skeleton';
 import type { PlantWithCover } from '../types/models';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+/** 한 칸에 그리는 식물 점 최대 개수. 넘치면 + 로 줄인다. */
+const MAX_DOTS = 3;
 
 export function CalendarPage() {
   const [month, setMonth] = useState(() => startOfMonth(new Date()));
@@ -47,7 +50,7 @@ export function CalendarPage() {
    * 날짜별로 "이 날 물 줄 식물" 을 모은다.
    *
    * 물을 주면 다음 예정일이 앞으로 밀리므로, **예정일이 오늘보다 과거로 남아 있다는 건
-   * 아직 안 줬다는 뜻**이다. 그걸 overdue 로 표시해 점을 짙게 그린다.
+   * 아직 안 줬다는 뜻**이다. 그걸 overdue 로 표시해 목록 문구와 스크린리더 라벨에 쓴다.
    */
   const wateringByDay = useMemo(() => {
     const map = new Map<string, { plant: PlantWithCover; overdue: boolean }[]>();
@@ -65,6 +68,10 @@ export function CalendarPage() {
     return map;
   }, [plants]);
 
+  // 보관한 식물은 목록에 없으니 기본색으로 그린다
+  const colorOf = (plantId: string) =>
+    plants?.find((p) => p.id === plantId)?.calendar_color ?? DEFAULT_PLANT_COLOR;
+
   const selectedEntries = (entries ?? []).filter((e) =>
     isSameDay(new Date(e.recorded_at), selected),
   );
@@ -77,14 +84,10 @@ export function CalendarPage() {
         style={{ color: 'var(--text-muted)' }}
       >
         <span className="inline-flex items-center gap-1">
-          <span className="size-1.5 rounded-full bg-leaf-500" aria-hidden /> 일지
+          <span className="size-1.5 rounded-full bg-leaf-500" aria-hidden /> 일지 (식물 색)
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="size-1.5 rounded-full bg-soil-300 opacity-50" aria-hidden />{' '}
-          물주기 예정
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="size-1.5 rounded-full bg-soil-500" aria-hidden /> 물주기 밀림
+          <Droplet className="size-2.5 fill-water-500/40 text-water-500" aria-hidden /> 물주기 예정
         </span>
       </p>
       <header className="flex items-center justify-between">
@@ -122,9 +125,12 @@ export function CalendarPage() {
           ))}
 
           {days.map((day) => {
-            const hasEntry = (entries ?? []).some((e) =>
+            const dayEntries = (entries ?? []).filter((e) =>
               isSameDay(new Date(e.recorded_at), day),
             );
+            const hasEntry = dayEntries.length > 0;
+            // 같은 식물의 일지가 여러 건이어도 점은 하나
+            const entryColors = [...new Set(dayEntries.map((e) => colorOf(e.plant_id)))];
             const watering = wateringByDay.get(format(day, 'yyyy-MM-dd')) ?? [];
             const wateringOverdue = watering.some((w) => w.overdue);
             const isSelected = isSameDay(day, selected);
@@ -154,19 +160,24 @@ export function CalendarPage() {
                 )}
               >
                 {format(day, 'd')}
-                <span className="flex h-1.5 gap-0.5">
-                  {hasEntry && (
-                    <span className="size-1.5 rounded-full bg-leaf-500" aria-hidden />
-                  )}
-                  {watering.length > 0 && (
-                    // 밀린 물주기는 짙게, 아직 안 온 예정은 흐리게
+                <span className="flex h-2.5 items-center gap-0.5">
+                  {entryColors.slice(0, MAX_DOTS).map((color) => (
                     <span
-                      className={cn(
-                        'size-1.5 rounded-full',
-                        wateringOverdue ? 'bg-soil-500' : 'bg-soil-300 opacity-50',
-                      )}
+                      key={color}
+                      className="size-1.5 rounded-full"
+                      style={{ background: color }}
                       aria-hidden
                     />
+                  ))}
+                  {entryColors.length > MAX_DOTS && (
+                    <span className="text-[8px] leading-[6px]" aria-hidden>
+                      +
+                    </span>
+                  )}
+                  {watering.length > 0 && (
+                    // 식물 색과 겹쳐도 구분되게 점이 아니라 물방울 모양으로.
+                    // 밀림은 색을 따로 두지 않는다 — 지난 날짜에 남아 있으면 곧 밀린 것
+                    <Droplet className="size-2.5 fill-water-500/40 text-water-500" aria-hidden />
                   )}
                 </span>
               </button>
@@ -192,7 +203,7 @@ export function CalendarPage() {
                     className="flex items-center gap-2 text-sm"
                   >
                     <Droplet
-                      className={cn('size-4', overdue ? 'text-soil-500' : 'text-soil-300')}
+                      className="size-4 text-water-500"
                       aria-hidden
                     />
                     <span className="font-medium">{plant.nickname}</span>
@@ -220,6 +231,11 @@ export function CalendarPage() {
                     to={`/entries/${entry.id}`}
                     className="flex items-center gap-2 text-sm"
                   >
+                    <span
+                      className="size-2 shrink-0 rounded-full"
+                      style={{ background: colorOf(entry.plant_id) }}
+                      aria-hidden
+                    />
                     <span className="font-medium">{entry.plant?.nickname ?? '식물'}</span>
                     <ActionList actions={entry.actions} />
                     {entry.note && <span className="truncate">{entry.note}</span>}

@@ -29,6 +29,8 @@ export interface Plant {
   cover_photo_id: string | null;
   watering_interval_days: number | null;
   last_watered_at: string | null;
+  /** 캘린더 점 색 (#rrggbb). null 이면 기본 초록 */
+  calendar_color: string | null;
   archived_at: string | null;
   created_at: string;
   updated_at: string;

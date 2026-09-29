@@ -22,6 +22,8 @@ export const plantFormSchema = z.object({
       (v) => v === '' || (/^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 365),
       '1~365 사이 숫자를 입력해주세요',
     ),
+  /** <input type="color"> 값. DB check 제약과 같은 형식 */
+  calendar_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, '색을 골라주세요'),
 });
 
 export type PlantFormValues = z.infer<typeof plantFormSchema>;

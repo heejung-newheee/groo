@@ -5,6 +5,7 @@ import { plantFormSchema, type PlantFormValues } from '../../lib/schemas/plant';
 import type { PlantInput } from '../../api/plants';
 import { Button } from '../ui/Button';
 import { Field, Input } from '../ui/Field';
+import { DEFAULT_PLANT_COLOR } from '../../lib/constants';
 import type { Plant } from '../../types/models';
 
 function toInput(values: PlantFormValues): PlantInput {
@@ -15,15 +16,19 @@ function toInput(values: PlantFormValues): PlantInput {
     adopted_at: values.adopted_at,
     location: values.location.trim() || null,
     watering_interval_days: interval === '' ? null : Number(interval),
+    calendar_color: values.calendar_color.toLowerCase(),
   };
 }
 
 export function PlantForm({
   plant,
+  defaultColor = DEFAULT_PLANT_COLOR,
   submitting,
   onSubmit,
 }: {
   plant?: Plant;
+  /** 새 식물의 캘린더 색 기본값 */
+  defaultColor?: string;
   submitting: boolean;
   onSubmit: (input: PlantInput) => void;
 }) {
@@ -39,6 +44,7 @@ export function PlantForm({
       adopted_at: plant?.adopted_at ?? format(new Date(), 'yyyy-MM-dd'),
       location: plant?.location ?? '',
       watering_interval_days: plant?.watering_interval_days?.toString() ?? '',
+      calendar_color: plant?.calendar_color ?? defaultColor,
     },
   });
 
@@ -71,6 +77,19 @@ export function PlantForm({
         hint="비워두면 물주기 알림을 받지 않아요. 선인장처럼 주기가 불규칙한 식물에 좋아요."
       >
         <Input type="number" min={1} max={365} {...register('watering_interval_days')} placeholder="7" />
+      </Field>
+
+      <Field
+        label="캘린더 색"
+        error={errors.calendar_color?.message}
+        hint="캘린더에서 이 식물의 일지가 이 색으로 표시돼요."
+      >
+        <input
+          type="color"
+          {...register('calendar_color')}
+          className="h-12 w-20 cursor-pointer rounded-input border bg-transparent p-1"
+          style={{ borderColor: 'var(--border-subtle)' }}
+        />
       </Field>
 
       <Button type="submit" disabled={submitting}>

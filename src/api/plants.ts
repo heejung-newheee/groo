@@ -46,6 +46,7 @@ export interface PlantInput {
   adopted_at: string;
   location: string | null;
   watering_interval_days: number | null;
+  calendar_color: string;
 }
 
 export async function createPlant(userId: string, input: PlantInput): Promise<Plant> {

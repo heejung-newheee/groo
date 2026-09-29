@@ -187,6 +187,7 @@ export type Database = {
         Row: {
           adopted_at: string
           archived_at: string | null
+          calendar_color: string | null
           cover_photo_id: string | null
           created_at: string
           id: string
@@ -201,6 +202,7 @@ export type Database = {
         Insert: {
           adopted_at?: string
           archived_at?: string | null
+          calendar_color?: string | null
           cover_photo_id?: string | null
           created_at?: string
           id?: string
@@ -215,6 +217,7 @@ export type Database = {
         Update: {
           adopted_at?: string
           archived_at?: string | null
+          calendar_color?: string | null
           cover_photo_id?: string | null
           created_at?: string
           id?: string

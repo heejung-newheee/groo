@@ -19,6 +19,24 @@ export const CARE_ACTIONS = [
   { value: 'other', emoji: '✍️', label: '기타' },
 ] as const;
 
+/**
+ * 새 식물에 순서대로 기본 배정하는 캘린더 색. 사용자는 아무 색이나 고를 수 있다.
+ * 물주기 점이 파랑이라 파랑 계열은 뺐다. 마이그레이션의 backfill 과 순서를 맞춘다.
+ */
+export const PLANT_COLORS = [
+  '#4a8b5c',
+  '#e0a526',
+  '#e07a3c',
+  '#d9534f',
+  '#e8a0bf',
+  '#8e6cc4',
+  '#2a9d8f',
+  '#9bbf3a',
+] as const;
+
+/** calendar_color 가 없을 때 */
+export const DEFAULT_PLANT_COLOR = PLANT_COLORS[0];
+
 export type CareAction = (typeof CARE_ACTIONS)[number]['value'];
 
 export const PHOTO = {
