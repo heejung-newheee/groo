@@ -45,6 +45,8 @@ export function useUpdatePlant(id: string) {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: qk.plants });
       void qc.invalidateQueries({ queryKey: qk.plant(id) });
+      // 일지 조회에 식물 정보(입양일 등)가 같이 붙어 온다
+      void qc.invalidateQueries({ queryKey: qk.entries });
     },
   });
 }
