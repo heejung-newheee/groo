@@ -88,6 +88,12 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Tailwind v4 는 button 커서를 default 로 되돌린다. 누를 수 있는 건 포인터로 */
+  button:not(:disabled),
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+
   /* D-day 숫자가 흔들리지 않게 */
   .tabular {
     font-variant-numeric: tabular-nums;
