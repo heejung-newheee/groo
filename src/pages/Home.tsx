@@ -94,13 +94,24 @@ export function Home() {
           <ul className="flex flex-col gap-2">
             {recent.map((entry) => (
               <li key={entry.id}>
-                <Link to={`/entries/${entry.id}`} className="flex items-center gap-2 text-sm">
-                  <span className="tabular" style={{ color: 'var(--text-muted)' }}>
+                {/* 한 줄 고정: 날짜·이름은 폭을 두고, 넘치는 건 … 로 자른다 */}
+                <Link
+                  to={`/entries/${entry.id}`}
+                  className="flex items-center gap-2 text-sm"
+                >
+                  <span
+                    className="tabular w-11 shrink-0"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
                     {formatMonthDay(entry.recorded_at)}
                   </span>
-                  <span className="font-medium">{entry.plant?.nickname ?? '식물'}</span>
-                  <ActionList actions={entry.actions} />
-                  {entry.note && <span className="truncate">{entry.note}</span>}
+                  <span className="w-18 shrink-0 truncate font-medium">
+                    {entry.plant?.nickname ?? '식물'}
+                  </span>
+                  <ActionList actions={entry.actions} compact />
+                  {entry.note && (
+                    <span className="min-w-0 flex-1 truncate">{entry.note}</span>
+                  )}
                 </Link>
               </li>
             ))}

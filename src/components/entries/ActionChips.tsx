@@ -34,9 +34,29 @@ export function ActionChips({
   );
 }
 
-/** 읽기 전용 — 일지 상세/타임라인에서 */
-export function ActionList({ actions }: { actions: CareAction[] }) {
+/**
+ * 읽기 전용 — 일지 상세/타임라인에서.
+ * compact 는 한 줄 목록용: 아이콘만 보이고 라벨은 툴팁·스크린리더로 남긴다.
+ */
+export function ActionList({ actions, compact = false }: { actions: CareAction[]; compact?: boolean }) {
   if (actions.length === 0) return null;
+
+  if (compact) {
+    return (
+      <span className="inline-flex shrink-0 gap-0.5">
+        {actions.map((value) => {
+          const meta = CARE_ACTIONS.find((a) => a.value === value);
+          if (!meta) return null;
+          return (
+            <span key={value} title={meta.label}>
+              <span aria-hidden>{meta.emoji}</span>
+              <span className="sr-only">{meta.label}</span>
+            </span>
+          );
+        })}
+      </span>
+    );
+  }
 
   return (
     <div className="flex flex-wrap gap-1.5">
