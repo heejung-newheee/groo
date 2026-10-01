@@ -1,5 +1,5 @@
 import { Calendar, House, PenLine, Settings, Sprout } from 'lucide-react';
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, useLocation } from 'react-router';
 import { cn } from '../../lib/cn';
 import { Logo } from '../ui/Logo';
 
@@ -10,12 +10,18 @@ const NAV = [
   { to: '/settings', label: '설정', Icon: Settings },
 ] as const;
 
+/** 작성·수정 화면. 여기서 FAB 가 보이면 저장 버튼으로 착각해 누르게 된다. */
+const FORM_PATH = /^\/(entries|plants)\/(new|[^/]+\/edit)$/;
+
 /**
  * 반응형 셸.
  *   < 768px  : 하단 탭 + FAB
  *   ≥ 768px  : 좌측 사이드바
  */
 export function AppShell() {
+  const { pathname } = useLocation();
+  const onForm = FORM_PATH.test(pathname);
+
   return (
     <div className="min-h-dvh md:flex">
       {/* ── 데스크톱/태블릿 사이드바 ── */}
@@ -57,13 +63,15 @@ export function AppShell() {
       </main>
 
       {/* ── 모바일 FAB ── */}
-      <NavLink
-        to="/entries/new"
-        aria-label="새 일지 쓰기"
-        className="fixed right-4 bottom-20 flex size-14 items-center justify-center rounded-full bg-leaf-500 text-white shadow-lg transition-transform active:scale-95 md:hidden"
-      >
-        <PenLine className="size-6" aria-hidden />
-      </NavLink>
+      {!onForm && (
+        <NavLink
+          to="/entries/new"
+          aria-label="새 일지 쓰기"
+          className="fixed right-4 bottom-20 flex size-14 items-center justify-center rounded-full bg-leaf-500 text-white shadow-lg transition-transform active:scale-95 md:hidden"
+        >
+          <PenLine className="size-6" aria-hidden />
+        </NavLink>
+      )}
 
       {/* ── 모바일 하단 탭 ── */}
       <nav

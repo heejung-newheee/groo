@@ -97,12 +97,7 @@ export function EntryEdit() {
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-5">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">기록 수정</h1>
-        <Button size="sm" disabled={busy} onClick={() => void handleSave()}>
-          {busy ? '저장 중…' : '저장'}
-        </Button>
-      </header>
+      <h1 className="text-xl font-bold">기록 수정</h1>
 
       {/* 이미 올린 사진과 새로 고른 사진을 한 그리드에 그린다 — 작성 화면과 같은 모양 */}
       <PhotoPickerField
@@ -213,6 +208,10 @@ export function EntryEdit() {
       {(update.isError || savePhotos.isError) && (
         <p className="text-sm text-urgent-500">저장하지 못했어요. 잠시 후 다시 시도해주세요.</p>
       )}
+
+      <Button disabled={busy} onClick={() => void handleSave()}>
+        {busy ? '저장 중…' : '저장'}
+      </Button>
     </div>
   );
 }
