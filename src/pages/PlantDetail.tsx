@@ -1,5 +1,5 @@
-import { PenLine, Settings2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { ImagePlus, PenLine, Settings2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { formatDday } from '../lib/dday';
 import { useEntriesByPlant } from '../hooks/useEntries';
@@ -7,6 +7,7 @@ import { usePlant } from '../hooks/usePlants';
 import { useAnalyzedPhotoIds } from '../hooks/useAiAnalysis';
 import { useSignedUrls } from '../hooks/useSignedUrls';
 import { Timeline } from '../components/entries/Timeline';
+import { CoverPicker } from '../components/plants/CoverPicker';
 import { WateringBadge } from '../components/plants/WateringBadge';
 import { Photo } from '../components/ui/Photo';
 import { Skeleton, TimelineSkeleton } from '../components/ui/Skeleton';
@@ -18,6 +19,7 @@ export function PlantDetail() {
   const entries = useEntriesByPlant(id);
   const { data: analyzed } = useAnalyzedPhotoIds();
   const { data: coverUrls } = useSignedUrls([plant?.cover_path ?? null]);
+  const [pickingCover, setPickingCover] = useState(false);
 
   // 무한스크롤 — 바닥 센티넬이 보이면 다음 페이지
   const sentinel = useRef<HTMLDivElement>(null);
@@ -45,11 +47,21 @@ export function PlantDetail() {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       {/* 넓은 화면에서는 사진을 키우는 대신 정보를 옆에 둔다 */}
       <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-6">
-        <Photo
-          url={coverUrl}
-          alt={`${plant.nickname} 대표 사진`}
-          className="aspect-[4/3] w-full shrink-0 rounded-card md:w-1/2"
-        />
+        <button
+          type="button"
+          onClick={() => setPickingCover(true)}
+          aria-label={`${plant.nickname} 대표 사진 바꾸기`}
+          className="relative w-full shrink-0 md:w-1/2"
+        >
+          <Photo
+            url={coverUrl}
+            alt={`${plant.nickname} 대표 사진`}
+            className="aspect-[4/3] w-full rounded-card"
+          />
+          <span className="absolute right-2 bottom-2 flex size-9 items-center justify-center rounded-full bg-bark-800/80 text-white">
+            <ImagePlus className="size-4" aria-hidden />
+          </span>
+        </button>
 
         <div className="flex flex-1 flex-col gap-4">
           <header className="flex items-start justify-between gap-3">
@@ -80,6 +92,8 @@ export function PlantDetail() {
           </Link>
         </div>
       </div>
+
+      {pickingCover && <CoverPicker plant={plant} onClose={() => setPickingCover(false)} />}
 
       <section>
         <h2 className="mb-3 font-bold">📜 타임라인</h2>

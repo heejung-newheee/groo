@@ -89,3 +89,16 @@ export async function replacePhotoFile(
   }
   await removeObjects([photo.storage_path]);
 }
+
+/** 대표 사진 고르기용 — 이 식물의 일지에 달린 사진 전부, 최근 것부터 */
+export async function listPlantPhotos(
+  plantId: string,
+): Promise<Pick<Photo, 'id' | 'storage_path'>[]> {
+  const { data, error } = await supabase
+    .from('photos')
+    .select('id, storage_path, entries!inner(plant_id)')
+    .eq('entries.plant_id', plantId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(({ id, storage_path }) => ({ id, storage_path }));
+}

@@ -14,6 +14,8 @@ export const qk = {
   entriesByMonth: (month: string) => ['entries', 'month', month] as const,
   entriesRecent: ['entries', 'recent'] as const,
   entry: (id: string) => ['entries', 'detail', id] as const,
+  // entries 아래에 둬서 일지·사진이 바뀔 때 같이 무효화되게 한다
+  plantPhotos: (plantId: string) => ['entries', 'photos', plantId] as const,
 
   analysis: (photoId: string) => ['ai', 'analysis', photoId] as const,
   aiQuota: ['ai', 'quota'] as const,
