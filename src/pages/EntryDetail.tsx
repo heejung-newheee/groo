@@ -11,6 +11,7 @@ import { AskWebAiCard } from '../components/ai/AskWebAiCard';
 import { ActionList } from '../components/entries/ActionChips';
 import { DateSourceNotice } from '../components/entries/DateSourceNotice';
 import { Carousel } from '../components/ui/Carousel';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { Photo } from '../components/ui/Photo';
 import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState, ErrorState } from '../components/ui/States';
@@ -22,6 +23,7 @@ export function EntryDetail() {
   const remove = useDeleteEntry();
   const [active, setActive] = useState(0);
   const [downloading, setDownloading] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const { data: urls } = useSignedUrls(entry?.photos.map((p) => p.storage_path) ?? []);
 
@@ -96,16 +98,23 @@ export function EntryDetail() {
             type="button"
             aria-label="기록 삭제"
             disabled={remove.isPending}
-            onClick={() => {
-              if (!window.confirm('이 기록을 삭제할까요? 되돌릴 수 없어요.')) return;
-              remove.mutate(entry.id, { onSuccess: () => void navigate(-1) });
-            }}
+            onClick={() => setConfirmingDelete(true)}
             className="p-2 text-urgent-500 disabled:opacity-50"
           >
             <Trash2 className="size-5" aria-hidden />
           </button>
         </div>
       </header>
+
+      {confirmingDelete && (
+        <ConfirmDialog
+          message="이 기록을 삭제할까요? 되돌릴 수 없어요."
+          confirmLabel="삭제"
+          busy={remove.isPending}
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={() => remove.mutate(entry.id, { onSuccess: () => void navigate(-1) })}
+        />
+      )}
 
       <ActionList actions={entry.actions} />
 
