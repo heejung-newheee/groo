@@ -1,3 +1,4 @@
+import { ArrowUpDown, Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { usePlants, useReorderPlants } from '../hooks/usePlants';
@@ -5,6 +6,7 @@ import { BRAND } from '../lib/constants';
 import { GrooCount } from '../components/plants/GrooCount';
 import { PlantGrid } from '../components/plants/PlantGrid';
 import { PlantReorderList } from '../components/plants/PlantReorderList';
+import { pill } from '../components/ui/pill';
 import type { PlantWithCover } from '../types/models';
 import { PlantGridSkeleton } from '../components/ui/Skeleton';
 import { EmptyState, ErrorState } from '../components/ui/States';
@@ -47,7 +49,7 @@ export function Plants() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold">
             <GrooCount count={plants.length} />
@@ -57,13 +59,18 @@ export function Plants() {
           </p>
         </div>
         {draft ? (
-          <div className="flex items-center gap-4 text-sm font-medium">
-            <button type="button" onClick={() => setDraft(null)} disabled={reorder.isPending}>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className={pill.outline}
+              onClick={() => setDraft(null)}
+              disabled={reorder.isPending}
+            >
               취소
             </button>
             <button
               type="button"
-              className="text-leaf-600 disabled:opacity-50"
+              className={pill.solid}
               disabled={reorder.isPending}
               onClick={() =>
                 reorder.mutate(
@@ -72,18 +79,21 @@ export function Plants() {
                 )
               }
             >
+              <Check className="size-3.5" aria-hidden />
               {reorder.isPending ? '저장 중…' : '완료'}
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-4 text-sm font-medium">
+          <div className="flex items-center gap-2">
             {plants.length > 1 && (
-              <button type="button" onClick={() => setDraft(plants)}>
+              <button type="button" className={pill.outline} onClick={() => setDraft(plants)}>
+                <ArrowUpDown className="size-3.5" aria-hidden />
                 순서 편집
               </button>
             )}
-            <Link to="/plants/new" className="text-leaf-600">
-              + 등록
+            <Link to="/plants/new" className={pill.solid}>
+              <Plus className="size-3.5" aria-hidden />
+              등록
             </Link>
           </div>
         )}
