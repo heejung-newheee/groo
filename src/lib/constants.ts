@@ -42,6 +42,8 @@ export type CareAction = (typeof CARE_ACTIONS)[number]['value'];
 export const PHOTO = {
   /** 리사이즈 후 긴 변 최대 픽셀 */
   maxEdge: 1600,
+  /** 카드용 썸네일 긴 변. 카드 폭 ~180px × 레티나 배율. */
+  thumbEdge: 480,
   /** WebP 인코딩 품질 */
   quality: 0.82,
   /** 원본 파일 최대 크기 (bytes) */

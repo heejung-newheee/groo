@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
-import { buildStoragePath, processImage } from '../lib/image';
+import { PHOTO } from '../lib/constants';
+import { buildStoragePath, processImage, thumbPath } from '../lib/image';
 import { removeObjects } from './storage';
 import type { Photo } from '../types/models';
 
@@ -8,6 +9,21 @@ export interface PendingPhoto {
   /** 원본에서 뽑은 촬영시각. 리사이즈하면 사라지므로 미리 들고 다닌다. */
   takenAt: Date | null;
   previewUrl: string;
+}
+
+/**
+ * 카드용 썸네일을 원본 옆에 올린다. 실패해도 업로드 자체는 막지 않는다 —
+ * 썸네일이 없으면 카드가 원본으로 대체해서 보여준다.
+ */
+async function uploadThumb(path: string, processed: Blob): Promise<void> {
+  try {
+    const { blob } = await processImage(processed, PHOTO.thumbEdge);
+    await supabase.storage
+      .from('plant-photos')
+      .upload(thumbPath(path), blob, { contentType: 'image/webp', upsert: false });
+  } catch {
+    // 원본으로 대체된다
+  }
 }
 
 /**
@@ -30,6 +46,7 @@ export async function uploadPhoto(
     .from('plant-photos')
     .upload(path, blob, { contentType: 'image/webp', upsert: false });
   if (uploadErr) throw uploadErr;
+  await uploadThumb(path, blob);
 
   const { data, error } = await supabase
     .from('photos')
@@ -48,7 +65,7 @@ export async function uploadPhoto(
 
   if (error) {
     // row 생성이 실패하면 고아 파일이 남는다. 되돌린다.
-    await removeObjects([path]);
+    await removeObjects([path, thumbPath(path)]);
     throw error;
   }
   return data as Photo;
@@ -57,7 +74,7 @@ export async function uploadPhoto(
 export async function deletePhoto(photo: Photo): Promise<void> {
   const { error } = await supabase.from('photos').delete().eq('id', photo.id);
   if (error) throw error;
-  await removeObjects([photo.storage_path]);
+  await removeObjects([photo.storage_path, thumbPath(photo.storage_path)]);
 }
 
 /**
@@ -77,6 +94,7 @@ export async function replacePhotoFile(
     .from('plant-photos')
     .upload(path, blob, { contentType: 'image/webp', upsert: false });
   if (uploadErr) throw uploadErr;
+  await uploadThumb(path, blob);
 
   const { error } = await supabase
     .from('photos')
@@ -84,10 +102,10 @@ export async function replacePhotoFile(
     .eq('id', photo.id);
 
   if (error) {
-    await removeObjects([path]);
+    await removeObjects([path, thumbPath(path)]);
     throw error;
   }
-  await removeObjects([photo.storage_path]);
+  await removeObjects([photo.storage_path, thumbPath(photo.storage_path)]);
 }
 
 /** 대표 사진 고르기용 — 이 식물의 일지에 달린 사진 전부, 최근 것부터 */
