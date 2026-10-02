@@ -12,10 +12,13 @@ export interface ProcessedImage {
  * imageOrientation: 'from-image' 가 EXIF Orientation 을 자동 적용한다.
  * 빼면 아이폰 세로 사진이 눕는다.
  */
-export async function processImage(file: Blob): Promise<ProcessedImage> {
+export async function processImage(
+  file: Blob,
+  maxEdge: number = PHOTO.maxEdge,
+): Promise<ProcessedImage> {
   const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
 
-  const scale = Math.min(1, PHOTO.maxEdge / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const width = Math.round(bitmap.width * scale);
   const height = Math.round(bitmap.height * scale);
 
@@ -75,4 +78,9 @@ export async function cropImage(source: Blob, area: CropArea, rotation: number):
  */
 export function buildStoragePath(userId: string, plantId: string): string {
   return `${userId}/${plantId}/${crypto.randomUUID()}.webp`;
+}
+
+/** 카드용 썸네일 경로. 원본 옆에 {uuid}.thumb.webp 로 둔다 (DB 에는 원본 경로만 저장). */
+export function thumbPath(path: string): string {
+  return path.replace(/\.webp$/, '.thumb.webp');
 }
