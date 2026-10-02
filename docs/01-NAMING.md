@@ -137,4 +137,5 @@ mv /Users/heejungyoo/Desktop/study/groo /Users/heejungyoo/Desktop/study/jaram
 | 영문 정식 | Groo |
 | 앱스토어명 | 그루 - 식물 성장 일기 |
 | 태그라인 | 오늘도 잘 자라는 중 |
-| 금지 표현 | "N그루" (카운팅 단위로 사용 금지) → "나의 초록이 N" |
+| 금지 표현 | "N그루" (한글 카운팅 단위로 사용 금지) |
+| 식물 수 표기 | "My N Groo" — 전체를 워드마크와 같은 폰트(Quicksand)로, 숫자와 Groo 는 leaf-500. 한글 '그루'가 아닌 영문 워드마크라 단위보다 브랜드로 읽힌다 |

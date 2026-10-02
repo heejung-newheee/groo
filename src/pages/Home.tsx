@@ -6,6 +6,7 @@ import { useMarkWatered, usePlants } from '../hooks/usePlants';
 import { useRecentEntries } from '../hooks/useEntries';
 import { useProfile } from '../hooks/useSession';
 import { PlantGrid } from '../components/plants/PlantGrid';
+import { GrooCount } from '../components/plants/GrooCount';
 import { ActionList } from '../components/entries/ActionChips';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -80,7 +81,9 @@ export function Home() {
 
       <section>
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-bold">🪴 내 식물 ({plants.length})</h2>
+          <h2 className="font-bold">
+            🪴 <GrooCount count={plants.length} />
+          </h2>
           <Link to="/plants" className="text-sm text-leaf-600">
             전체 &gt;
           </Link>

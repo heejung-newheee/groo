@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { usePlants, useReorderPlants } from '../hooks/usePlants';
+import { BRAND } from '../lib/constants';
+import { GrooCount } from '../components/plants/GrooCount';
 import { PlantGrid } from '../components/plants/PlantGrid';
 import { PlantReorderList } from '../components/plants/PlantReorderList';
 import type { PlantWithCover } from '../types/models';
@@ -46,7 +48,14 @@ export function Plants() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{plants.length} Groo</h1>
+        <div>
+          <h1 className="text-xl font-bold">
+            <GrooCount count={plants.length} />
+          </h1>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            {BRAND.tagline}
+          </p>
+        </div>
         {draft ? (
           <div className="flex items-center gap-4 text-sm font-medium">
             <button type="button" onClick={() => setDraft(null)} disabled={reorder.isPending}>
