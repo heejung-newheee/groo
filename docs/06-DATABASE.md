@@ -50,6 +50,8 @@ create table plants (
   cover_photo_id uuid,          -- FK 안 걸음 (photos→entries→plants 순환)
   watering_interval_days smallint check (watering_interval_days between 1 and 365),
   last_watered_at date,
+  calendar_color text check (calendar_color ~ '^#[0-9a-f]{6}$'),  -- null 이면 기본 초록
+  sort_order     integer,       -- 사용자가 정한 순서. null 이면 맨 앞(최신순)
   archived_at    timestamptz,   -- soft delete
   created_at     timestamptz not null default now(),
   updated_at     timestamptz not null default now()
@@ -58,6 +60,10 @@ create index plants_user_active_idx on plants (user_id, archived_at nulls first)
 ```
 
 - `watering_interval_days`가 `null`이면 알림 없음 (선인장 등)
+- 다음 물주기 = `last_watered_at + watering_interval_days` (물 준 날은 세지 않는다. 1일에 주고 주기 4면 5일).
+  `last_watered_at`은 **로컬(한국) 날짜**로 저장한다. `recorded_at`(UTC ISO)을 `slice(0, 10)` 하면 오전 0~9시 기록이 전날이 된다.
+- `calendar_color`: 캘린더 일지 점 색. 아무 색이나 고를 수 있고, 새 식물은 팔레트(`PLANT_COLORS`)에서 순서대로 기본값을 준다. 물주기가 파랑이라 팔레트에서 파랑 계열은 뺐다.
+- `sort_order`: 내 식물 순서 편집. 목록은 `sort_order asc nulls first, created_at desc` — 순서를 안 정한 새 식물이 맨 앞에 온다.
 - `archived_at`으로 **soft delete** — 떠나보낸 식물의 기록도 남긴다. 정서적으로도, 실수 삭제 방지 차원에서도 맞다.
 - `cover_photo_id`에 FK를 안 건 이유: `photos → entries → plants` 순환 참조가 생긴다. 앱단에서 관리한다.
 

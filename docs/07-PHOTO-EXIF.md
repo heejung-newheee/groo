@@ -15,6 +15,9 @@
    │
    ├─③ GPS 확인 → 저장하지 않음     ← 개인정보 (09-SECURITY.md)
    │
+   ├─(선택) 회전·크롭               ← EXIF 를 뽑은 "뒤"에. 편집본은 canvas 라 메타데이터가 없다
+   │     cropImage(blob, area, rotation) → WebP
+   │
    ├─④ 리사이즈 + WebP 인코딩       ← 이 시점에 EXIF 전부 소멸 (의도한 것)
    │     createImageBitmap → canvas → toBlob
    │     긴 변 1600px, quality 0.82
