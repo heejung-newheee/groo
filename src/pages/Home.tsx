@@ -1,4 +1,4 @@
-import { Droplet } from 'lucide-react';
+import { ChevronRight, Droplet } from 'lucide-react';
 import { Link } from 'react-router';
 import { needsWateringToday, plantWateringInput } from '../lib/watering';
 import { formatMonthDay } from '../lib/format';
@@ -6,6 +6,8 @@ import { useMarkWatered, usePlants } from '../hooks/usePlants';
 import { useRecentEntries } from '../hooks/useEntries';
 import { useProfile } from '../hooks/useSession';
 import { PlantGrid } from '../components/plants/PlantGrid';
+import { GrooCount } from '../components/plants/GrooCount';
+import { pill } from '../components/ui/pill';
 import { ActionList } from '../components/entries/ActionChips';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -80,9 +82,12 @@ export function Home() {
 
       <section>
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-bold">🪴 내 식물 ({plants.length})</h2>
-          <Link to="/plants" className="text-sm text-leaf-600">
-            전체 &gt;
+          <h2 className="font-bold">
+            🪴 <GrooCount count={plants.length} />
+          </h2>
+          <Link to="/plants" className={pill.soft}>
+            전체
+            <ChevronRight className="size-3.5" aria-hidden />
           </Link>
         </div>
         <PlantGrid plants={plants} />

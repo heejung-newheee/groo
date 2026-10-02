@@ -7,16 +7,16 @@
 
 ## 스택
 
-| 영역 | 선택 |
-|---|---|
-| 프레임워크 | React 19 + Vite 8 + TypeScript 6 |
-| 라우팅 | React Router 8 (declarative mode) |
-| 서버 상태 | TanStack Query 5 |
-| 클라이언트 상태 | Zustand 5 |
-| 검증 | zod 4 |
-| 스타일 | Tailwind CSS 4 |
-| 백엔드 | Supabase (Postgres + Auth + Storage + Edge Functions) |
-| AI | Claude API (vision) |
+| 영역            | 선택                                                  |
+| --------------- | ----------------------------------------------------- |
+| 프레임워크      | React 19 + Vite 8 + TypeScript 6                      |
+| 라우팅          | React Router 8 (declarative mode)                     |
+| 서버 상태       | TanStack Query 5                                      |
+| 클라이언트 상태 | Zustand 5                                             |
+| 검증            | zod 4                                                 |
+| 스타일          | Tailwind CSS 4                                        |
+| 백엔드          | Supabase (Postgres + Auth + Storage + Edge Functions) |
+| AI              | Claude API (vision)                                   |
 
 ## 시작하기
 
@@ -64,13 +64,12 @@ src/
 
 ## 현재 상태
 
-MVP F1~F8 코드는 전부 작성되어 있습니다. 남은 건 배포/설정입니다.
-
 - ✅ 프로젝트 셋업, 디자인 토큰, 반응형 셸, 라우팅
 - ✅ `src/lib` 순수 함수 + 테스트 21개
-- ✅ DB 마이그레이션 3개 (스키마 / RLS / Storage)
+- ✅ DB 마이그레이션 5개 (스키마 / RLS / Storage / 식물 캘린더 색 / 식물 순서)
 - ✅ 소셜 로그인, 식물 CRUD, 일지 작성, EXIF 추출, 타임라인, 물주기, 캘린더, 설정
-- ✅ AI 진단 Edge Function (`supabase/functions/analyze-plant`)
+- ✅ 사진 회전·크롭 (`react-easy-crop`), 사진 다운로드, 식물별 캘린더 색, 내 식물 순서 편집
+- ⏸️ ~~AI 진단 Edge Function (`supabase/functions/analyze-plant`)~~ — 추후 진행 고려 (코드는 남겨둠)
 - ⏸️ `supabase login` → `db:push` → `types:gen` (브라우저 인증 필요)
 - ⏸️ Supabase 대시보드에서 Google / Apple / Kakao OAuth 설정
 - ⏸️ `supabase secrets set ANTHROPIC_API_KEY=...` → `functions deploy analyze-plant`

@@ -29,6 +29,9 @@ Tailwind v4는 CSS-first다. `src/index.css`의 `@theme` 블록에 정의한다.
   --color-soil-500: #8B6F47;
   --color-soil-700: #5E4A2E;
 
+  /* Water — 캘린더 물주기 물방울 */
+  --color-water-500: #3B82F6;
+
   /* Special — 개화/이벤트 */
   --color-bloom-400: #E8A0BF;
 

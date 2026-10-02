@@ -66,13 +66,7 @@ export function EntryNew() {
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-5">
-      {/* 저장은 항상 우상단 고정 */}
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">일지 쓰기</h1>
-        <Button size="sm" disabled={!canSave} onClick={handleSave}>
-          {create.isPending ? '저장 중…' : '저장'}
-        </Button>
-      </header>
+      <h1 className="text-xl font-bold">일지 쓰기</h1>
 
       <Field label="어떤 식물인가요?">
         <Select value={plantId} onChange={(e) => setPlantId(e.currentTarget.value)}>
@@ -131,6 +125,10 @@ export function EntryNew() {
       {create.isError && (
         <p className="text-sm text-urgent-500">저장하지 못했어요. 잠시 후 다시 시도해주세요.</p>
       )}
+
+      <Button disabled={!canSave} onClick={handleSave}>
+        {create.isPending ? '저장 중…' : '저장'}
+      </Button>
     </div>
   );
 }
