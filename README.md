@@ -69,7 +69,7 @@ src/
 - ✅ DB 마이그레이션 5개 (스키마 / RLS / Storage / 식물 캘린더 색 / 식물 순서)
 - ✅ 소셜 로그인, 식물 CRUD, 일지 작성, EXIF 추출, 타임라인, 물주기, 캘린더, 설정
 - ✅ 사진 회전·크롭 (`react-easy-crop`), 사진 다운로드, 식물별 캘린더 색, 내 식물 순서 편집
-- ✅ AI 진단 Edge Function (`supabase/functions/analyze-plant`)
+- ⏸️ ~~AI 진단 Edge Function (`supabase/functions/analyze-plant`)~~ — 추후 진행 고려 (코드는 남겨둠)
 - ⏸️ `supabase login` → `db:push` → `types:gen` (브라우저 인증 필요)
 - ⏸️ Supabase 대시보드에서 Google / Apple / Kakao OAuth 설정
 - ⏸️ `supabase secrets set ANTHROPIC_API_KEY=...` → `functions deploy analyze-plant`
