@@ -14,9 +14,12 @@ import type {
 
 export const POST_PAGE_SIZE = 20;
 
-/** 개수는 PostgREST 의 embed count 로 받는다. my_like 는 아래에서 내 것만 남기도록 거른다. */
+/**
+ * 개수는 PostgREST 의 embed count 로 받는다. my_like 는 아래에서 내 것만 남기도록 거른다.
+ * 작성자는 FK 이름을 명시한다 — likes 를 거쳐 profiles 로 가는 길도 있어 그냥 쓰면 300(PGRST201)이 난다.
+ */
 const POST_SELECT =
-  '*, author:profiles(id, display_name, avatar_url), photos:post_photos(*), likes(count), comments(count), my_like:likes(user_id)';
+  '*, author:profiles!posts_user_id_fkey(id, display_name, avatar_url), photos:post_photos(*), likes(count), comments(count), my_like:likes(user_id)';
 
 interface PostRow extends Omit<
   PostWithMeta,
