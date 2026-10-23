@@ -1,4 +1,4 @@
-import { Calendar, House, PenLine, Settings, Sprout } from 'lucide-react';
+import { Calendar, House, PenLine, Settings, Sprout, Users } from 'lucide-react';
 import { NavLink, Outlet, useLocation } from 'react-router';
 import { cn } from '../../lib/cn';
 import { Logo } from '../ui/Logo';
@@ -7,11 +7,14 @@ const NAV = [
   { to: '/home', label: '홈', Icon: House },
   { to: '/calendar', label: '캘린더', Icon: Calendar },
   { to: '/plants', label: '내 식물', Icon: Sprout },
+  { to: '/community', label: '커뮤니티', Icon: Users },
   { to: '/settings', label: '설정', Icon: Settings },
 ] as const;
 
 /** 작성·수정 화면. 여기서 FAB 가 보이면 저장 버튼으로 착각해 누르게 된다. */
 const FORM_PATH = /^\/(entries|plants)\/(new|[^/]+\/edit)$/;
+/** 커뮤니티에는 자체 글쓰기 버튼이 있다. 일지 FAB 가 같이 있으면 헷갈린다. */
+const COMMUNITY_PATH = /^\/community(\/|$)/;
 
 /**
  * 반응형 셸.
@@ -20,7 +23,7 @@ const FORM_PATH = /^\/(entries|plants)\/(new|[^/]+\/edit)$/;
  */
 export function AppShell() {
   const { pathname } = useLocation();
-  const onForm = FORM_PATH.test(pathname);
+  const hideFab = FORM_PATH.test(pathname) || COMMUNITY_PATH.test(pathname);
 
   return (
     <div className="min-h-dvh md:flex">
@@ -63,7 +66,7 @@ export function AppShell() {
       </main>
 
       {/* ── 모바일 FAB ── */}
-      {!onForm && (
+      {!hideFab && (
         <NavLink
           to="/entries/new"
           aria-label="새 일지 쓰기"

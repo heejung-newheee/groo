@@ -54,6 +54,21 @@ export const PHOTO = {
   accept: 'image/jpeg,image/png,image/webp',
 } as const;
 
+export const COMMUNITY = {
+  kinds: [
+    { value: 'show', label: '자랑' },
+    { value: 'question', label: '질문' },
+  ],
+  reportReasons: [
+    { value: 'spam', label: '스팸·광고' },
+    { value: 'abuse', label: '욕설·비방' },
+    { value: 'inappropriate', label: '부적절한 사진·내용' },
+    { value: 'other', label: '기타' },
+  ],
+  maxBodyLength: 2000,
+  maxCommentLength: 1000,
+} as const;
+
 export const AI = {
   /** 유저당 일일 무료 횟수 */
   dailyQuota: 5,

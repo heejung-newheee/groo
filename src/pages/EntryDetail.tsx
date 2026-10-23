@@ -1,4 +1,4 @@
-import { Download, Pencil, Trash2 } from 'lucide-react';
+import { Download, Pencil, Share2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Link, useNavigate, useParams } from 'react-router';
@@ -90,6 +90,13 @@ export function EntryDetail() {
               <Download className="size-5" aria-hidden />
             </button>
           )}
+          <Link
+            to={`/community/new?entryId=${entry.id}`}
+            aria-label="커뮤니티에 자랑하기"
+            className="p-2"
+          >
+            <Share2 className="size-5" aria-hidden />
+          </Link>
           <Link to={`/entries/${entry.id}/edit`} aria-label="기록 수정" className="p-2">
             <Pencil className="size-5" aria-hidden />
           </Link>

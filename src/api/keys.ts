@@ -15,6 +15,12 @@ export const qk = {
   entriesRecent: ['entries', 'recent'] as const,
   entry: (id: string) => ['entries', 'detail', id] as const,
 
+  posts: ['posts'] as const,
+  postFeed: (kind: string, userId: string) => ['posts', 'feed', kind, userId] as const,
+  post: (id: string) => ['posts', 'detail', id] as const,
+  comments: (postId: string) => ['posts', 'comments', postId] as const,
+  author: (id: string) => ['authors', id] as const,
+
   analysis: (photoId: string) => ['ai', 'analysis', photoId] as const,
   aiQuota: ['ai', 'quota'] as const,
 
