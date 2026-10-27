@@ -80,3 +80,54 @@ export type EntryPlant = Pick<
 export interface EntryWithPlant extends EntryWithPhotos {
   plant: EntryPlant | null;
 }
+
+// ── 커뮤니티 ────────────────────────────────────────────────
+
+export type PostKind = 'show' | 'question';
+export type ReportReason = 'spam' | 'abuse' | 'inappropriate' | 'other';
+
+/** 다른 사람에게 보여주는 작성자 정보 */
+export type Author = Pick<Profile, 'id' | 'display_name' | 'avatar_url'>;
+
+export interface PostPhoto {
+  id: string;
+  post_id: string;
+  storage_path: string;
+  width: number;
+  height: number;
+  sort_order: number;
+}
+
+export interface Post {
+  id: string;
+  user_id: string;
+  kind: PostKind;
+  body: string;
+  plant_id: string | null;
+  /** 태그한 식물. 올릴 때의 값을 복사해 둔 것이다 */
+  plant_nickname: string | null;
+  plant_species: string | null;
+  plant_adopted_at: string | null;
+  /** 신고 누적으로 숨겨짐. 작성자에게만 내려온다 */
+  hidden_at: string | null;
+  created_at: string;
+}
+
+/** 피드·상세에 그리는 형태. 개수와 내 좋아요 여부까지 붙인다 */
+export interface PostWithMeta extends Post {
+  author: Author | null;
+  photos: PostPhoto[];
+  like_count: number;
+  comment_count: number;
+  liked_by_me: boolean;
+}
+
+export interface Comment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  body: string;
+  hidden_at: string | null;
+  created_at: string;
+  author: Author | null;
+}

@@ -17,6 +17,12 @@ export const qk = {
   // entries 아래에 둬서 일지·사진이 바뀔 때 같이 무효화되게 한다
   plantPhotos: (plantId: string) => ['entries', 'photos', plantId] as const,
 
+  posts: ['posts'] as const,
+  postFeed: (kind: string, userId: string) => ['posts', 'feed', kind, userId] as const,
+  post: (id: string) => ['posts', 'detail', id] as const,
+  comments: (postId: string) => ['posts', 'comments', postId] as const,
+  author: (id: string) => ['authors', id] as const,
+
   analysis: (photoId: string) => ['ai', 'analysis', photoId] as const,
   aiQuota: ['ai', 'quota'] as const,
 

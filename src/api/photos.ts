@@ -15,7 +15,7 @@ export interface PendingPhoto {
  * 카드용 썸네일을 원본 옆에 올린다. 실패해도 업로드 자체는 막지 않는다 —
  * 썸네일이 없으면 카드가 원본으로 대체해서 보여준다.
  */
-async function uploadThumb(path: string, processed: Blob): Promise<void> {
+export async function uploadThumb(path: string, processed: Blob): Promise<void> {
   try {
     const { blob } = await processImage(processed, PHOTO.thumbEdge);
     await supabase.storage

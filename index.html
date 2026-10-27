@@ -8,6 +8,15 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
+    <!-- 홈 화면에 추가하면 주소창 없이 앱처럼 뜬다 (display: standalone) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- iOS 16.4 미만은 매니페스트의 display 를 읽지 않아 아래 태그가 필요하다 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="그루" />
+    <!-- default: 상태바가 본문을 덮지 않는다. 상단 safe-area 여백을 따로 두지 않았으므로 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
     <!-- 워드마크 'Groo' 전용. 라틴 4글자라 본문 폰트와 섞지 않는다. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

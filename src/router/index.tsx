@@ -3,6 +3,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { RequireAuth } from './guards';
 import { AuthCallback } from '../pages/AuthCallback';
 import { CalendarPage } from '../pages/CalendarPage';
+import { Community } from '../pages/Community';
 import { EntryDetail } from '../pages/EntryDetail';
 import { EntryEdit } from '../pages/EntryEdit';
 import { EntryNew } from '../pages/EntryNew';
@@ -14,8 +15,11 @@ import { PlantDetail } from '../pages/PlantDetail';
 import { PlantEdit } from '../pages/PlantEdit';
 import { PlantNew } from '../pages/PlantNew';
 import { Plants } from '../pages/Plants';
+import { PostDetail } from '../pages/PostDetail';
+import { PostNew } from '../pages/PostNew';
 import { Settings } from '../pages/Settings';
 import { Signup } from '../pages/Signup';
+import { UserProfile } from '../pages/UserProfile';
 
 /**
  * declarative(library) mode 를 쓴다. framework mode(SSR)를 쓰지 않는 이유는
@@ -43,6 +47,10 @@ export const router = createBrowserRouter([
           { path: '/entries/:id', element: <EntryDetail /> },
           { path: '/entries/:id/edit', element: <EntryEdit /> },
           { path: '/calendar', element: <CalendarPage /> },
+          { path: '/community', element: <Community /> },
+          { path: '/community/new', element: <PostNew /> },
+          { path: '/community/posts/:id', element: <PostDetail /> },
+          { path: '/community/users/:id', element: <UserProfile /> },
           { path: '/settings', element: <Settings /> },
         ],
       },

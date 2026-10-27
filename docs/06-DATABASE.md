@@ -14,6 +14,11 @@ auth.users (Supabase 관리)
                          └──1:N── ai_analyses (photo당 1건)
 
 ai_usage (user_id + day 복합키) — 쿼터 카운터
+
+profiles ─1:N─ posts ──1:N── post_photos
+                 ├──1:N── comments
+                 ├──1:N── likes    (post_id + user_id 복합키)
+                 └──1:N── reports  (post 또는 comment 중 하나)
 ```
 
 ## 스키마
@@ -158,6 +163,19 @@ create table ai_usage (
 
 Edge Function만 증가시킨다. 클라이언트는 읽기만 가능.
 
+### 커뮤니티 (posts · post_photos · comments · likes · reports)
+
+전체 SQL은 `20261002000001_community.sql`. 설계 의도만 적는다.
+
+- **작성자 FK는 `profiles`를 가리킨다** (`auth.users` 아님) — PostgREST가 `author:profiles(...)` 로 embed 하려면 필요하다
+- **식물 태그는 값을 복사한다** (`plant_nickname`, `plant_species`, `plant_adopted_at`).
+  `plants` 는 본인만 읽을 수 있어 다른 사람에게 보여줄 수 없다. `plant_id` 는 `on delete set null`
+- **사진은 같은 버킷의 `{user_id}/posts/{uuid}.webp`**. 일지에서 가져온 사진도 파일을 복사한다
+- **`reports` 는 `post_id` / `comment_id` 중 정확히 하나** (`num_nonnulls = 1`). FK라 대상이 지워지면 같이 지워진다.
+  `(reporter_id, 대상)` unique — 한 사람이 혼자 자동 숨김을 일으키지 못하게
+- **자동 숨김**: `reports` insert 트리거(`hide_reported`, security definer)가 신고 3건이면 `hidden_at` 을 채운다
+- 좋아요·댓글 수는 컬럼으로 두지 않고 embed count(`likes(count)`)로 센다. 느려지면 그때 카운터 컬럼
+
 ---
 
 ## RLS — 전 테이블 예외 없이
@@ -208,6 +226,24 @@ create policy "read own usage" on ai_usage for select
   using ((select auth.uid()) = user_id);
 ```
 
+### 커뮤니티 — 로그인한 사용자끼리만
+
+모든 정책이 `to authenticated` 다. anon 은 아무것도 못 본다.
+
+| 테이블 | select | insert | delete | update |
+|---|---|---|---|---|
+| `profiles` | **로그인한 누구나** (작성자 이름·아바타) | — | — | 본인 |
+| `posts` | 숨김 아닌 글 + 내 글 | 본인, `hidden_at` null | 본인 | **없음** |
+| `post_photos` | 볼 수 있는 글의 사진 | 내 글 + 경로가 `{내 id}/posts/` | (글 삭제 cascade) | 없음 |
+| `comments` | 숨김 아닌 댓글 + 내 댓글 (볼 수 있는 글에 한해) | 본인, 숨김 아닌 글에만 | 본인 | 없음 |
+| `likes` | 누구나 | 본인 | 본인 | 없음 |
+| `reports` | **없음** (누가 신고했는지 비공개) | 본인 | — | 없음 |
+
+- **posts 에 update 정책을 만들지 않는다** — 있으면 작성자가 `hidden_at` 을 지워 숨김을 풀 수 있다
+- `profiles` 를 열면서 `timezone`·`theme` 도 같이 보인다. 민감하지 않다고 판단했다.
+  공개용 view 는 RLS 를 우회하는 security definer view 가 되어 Advisor 경고가 나므로 쓰지 않았다
+- 서브쿼리(`exists (select 1 from posts ...)`)에도 posts 의 RLS가 걸린다 → 숨긴 글의 사진·댓글은 자연히 안 보인다
+
 ---
 
 ## Storage 정책
@@ -236,6 +272,19 @@ create policy "delete own folder" on storage.objects for delete
 ```
 
 경로 첫 세그먼트를 `user_id`로 강제하면 **남의 폴더에 업로드하거나 읽는 게 구조적으로 불가능**해진다.
+
+**예외 — 커뮤니티 사진**: `{user_id}/posts/` 아래 파일은 볼 수 있는 `post_photos` 에 등록된 경우에만 로그인한 누구나 읽는다.
+썸네일(`.thumb.webp`)은 원본 경로로 바꿔 찾는다.
+
+```sql
+create policy "read community photos" on storage.objects for select to authenticated
+  using (
+    bucket_id = 'plant-photos'
+    and (storage.foldername(name))[2] = 'posts'
+    and exists (select 1 from public.post_photos pp
+                where pp.storage_path = replace(name, '.thumb.webp', '.webp'))
+  );
+```
 
 ### 이미지 조회 방식
 
