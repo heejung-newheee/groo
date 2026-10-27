@@ -1,7 +1,7 @@
 {
-  "name": "그루 - 식물 성장 일기",
-  "short_name": "그루",
-  "description": "식물의 성장을 사진으로 기록하는 다이어리",
+  "name": "Groo",
+  "short_name": "Groo",
+  "description": "식물의 성장을 기록하는 다이어리",
   "lang": "ko",
   "id": "/",
   "start_url": "/home",
@@ -11,8 +11,23 @@
   "background_color": "#FBF9F4",
   "theme_color": "#4A8B5C",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
