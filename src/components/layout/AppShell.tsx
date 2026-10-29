@@ -59,7 +59,8 @@ export function AppShell() {
       </aside>
 
       {/* ── 본문 ── */}
-      <main className="flex-1 pb-20 md:pb-0">
+      {/* 홈 화면 앱(standalone)에선 하단 탭이 홈 인디케이터만큼 높아진다. FAB·여백도 같이 올린다 */}
+      <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
         <div className="mx-auto max-w-[1200px] px-4 py-5 md:px-6">
           <Outlet />
         </div>
@@ -70,7 +71,7 @@ export function AppShell() {
         <NavLink
           to="/entries/new"
           aria-label="새 일지 쓰기"
-          className="fixed right-4 bottom-20 flex size-14 items-center justify-center rounded-full bg-leaf-500 text-white shadow-lg transition-transform active:scale-95 md:hidden"
+          className="fixed right-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] flex size-14 items-center justify-center rounded-full bg-leaf-500 text-white shadow-lg transition-transform active:scale-95 md:hidden"
         >
           <PenLine className="size-6" aria-hidden />
         </NavLink>
