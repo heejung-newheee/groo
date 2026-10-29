@@ -97,6 +97,12 @@
     cursor: pointer;
   }
 
+  /* 포커스 표시는 여기 한 곳에서 정한다. 입력창·버튼·칩 모두 같은 연초록 링을 두른다 */
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-leaf-500) 35%, transparent);
+    outline-offset: 0;
+  }
+
   /* D-day 숫자가 흔들리지 않게 */
   .tabular {
     font-variant-numeric: tabular-nums;

@@ -11,11 +11,12 @@ import {
 } from 'react';
 import { cn } from '../../lib/cn';
 
+// 테두리 색은 클래스로 둔다. 인라인 style 로 주면 focus: 클래스를 이겨서 포커스가 안 보인다.
 const BASE =
-  'w-full rounded-input border px-3 py-3 text-[15px] outline-none transition-colors focus:border-leaf-500';
+  'w-full rounded-input border border-[var(--border-subtle)] px-3 py-3 text-[15px] transition-colors focus:border-leaf-500';
 
 function fieldStyle() {
-  return { background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' };
+  return { background: 'var(--bg-surface)' };
 }
 
 export function Field({
@@ -47,7 +48,10 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
   return <input className={cn(BASE, className)} style={fieldStyle()} {...props} />;
 }
 
-export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function Textarea({
+  className,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea className={cn(BASE, 'resize-y', className)} style={fieldStyle()} {...props} />
   );
@@ -92,7 +96,12 @@ export function Select({
   }, [open]);
 
   function openList() {
-    setActive(Math.max(0, options.findIndex((o) => o.value === value)));
+    setActive(
+      Math.max(
+        0,
+        options.findIndex((o) => o.value === value),
+      ),
+    );
     setOpen(true);
   }
 
@@ -133,7 +142,12 @@ export function Select({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
-        className={cn(BASE, 'flex items-center justify-between gap-2 text-left', className)}
+        className={cn(
+          BASE,
+          'flex items-center justify-between gap-2 text-left',
+          open && 'border-leaf-500',
+          className,
+        )}
         style={fieldStyle()}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={handleKeyDown}
@@ -154,7 +168,7 @@ export function Select({
         <ul
           id={listId}
           role="listbox"
-          className="absolute inset-x-0 top-full z-40 mt-1.5 max-h-64 overflow-y-auto rounded-input border p-1 shadow-lg"
+          className="absolute inset-x-0 top-full z-40 mt-1 max-h-64 overflow-y-auto rounded-input border p-1 shadow-lg"
           style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-subtle)' }}
         >
           {options.map((option, i) => {
