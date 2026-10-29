@@ -94,14 +94,14 @@ function PostForm({
       </div>
 
       <Field label="어떤 식물인가요? (선택)" hint="이름·품종·함께한 날이 글에 같이 보여요">
-        <Select value={plantId} onChange={(e) => setPlantId(e.currentTarget.value)}>
-          <option value="">태그 안 함</option>
-          {plants?.map((plant) => (
-            <option key={plant.id} value={plant.id}>
-              {plant.nickname}
-            </option>
-          ))}
-        </Select>
+        <Select
+          value={plantId}
+          onChange={setPlantId}
+          options={[
+            { value: '', label: '태그 안 함' },
+            ...(plants ?? []).map((plant) => ({ value: plant.id, label: plant.nickname })),
+          ]}
+        />
       </Field>
 
       <PhotoPickerField

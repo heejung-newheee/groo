@@ -69,14 +69,11 @@ export function EntryNew() {
       <h1 className="text-xl font-bold">일지 쓰기</h1>
 
       <Field label="어떤 식물인가요?">
-        <Select value={plantId} onChange={(e) => setPlantId(e.currentTarget.value)}>
-          <option value="">선택해주세요</option>
-          {plants.map((plant) => (
-            <option key={plant.id} value={plant.id}>
-              {plant.nickname}
-            </option>
-          ))}
-        </Select>
+        <Select
+          value={plantId}
+          onChange={setPlantId}
+          options={plants.map((plant) => ({ value: plant.id, label: plant.nickname }))}
+        />
       </Field>
 
       <PhotoPickerField
